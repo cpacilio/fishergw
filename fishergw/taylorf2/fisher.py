@@ -125,7 +125,7 @@ References:
         self.Qavg = Qavg
         self.fmin = s[0].min()
         self.fmax = s[0].max()
-        self.psd = interp1d(s[0],s[1]/Qavg**2)
+        self.psd = interp1d(s[0],s[1]/Qavg**2,kind='cubic')
         return self
     
     def fisher_matrix(self,fmin=None,fmax=None,nbins=int(1e5),priors=None):

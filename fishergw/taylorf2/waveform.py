@@ -155,8 +155,9 @@ def _phase_coefficients_():
     ## leading SO
     out.append(-16*pi + beta)
     ## leading SS
-    out.append(Rational(15293365,508032) + 27145*eta/504 + 3085*eta**2/72 + sigma)
+    out.append(Rational(15293365,508032) + 27145*eta/504 + 3085*eta**2/72 + sigma)     
     out.append((38645*pi/756 - 65*pi*eta/9 + gamma)*(1+3*sp.log(v)))
+    #out.append((38645*pi/756 + 15*pi*eta/9 + gamma)*(1+3*sp.log(v)))
     out.append(Rational(11583231236531,4694215680) - 6848*gE/21 -\
         640*pi**2/3 + (2255*pi**2/12 - Rational(15737765635,3048192))*eta +\
         76055*eta**2/1728 - 127825*eta**3/1296 + xi - Rational(6848,63)*sp.log(64*v**3))
@@ -214,7 +215,8 @@ class TaylorF2():
     [1] Maggiore, Michele. Gravitational waves: Volume 1: Theory and experiments. Vol. 1. Oxford university press, 2008.
     """
 
-    def __init__(self,obj1,obj2,d_L=100.0,t_c=0.0,phi_c=0.0,redshift=False):
+    def __init__(self,obj1,obj2,d_L=100.0,t_c=0.0,phi_c=0.0,redshift=False,\
+                PN_phase=3.5):
         """
         
         :param obj1: Primary compact object in the binary.
@@ -259,6 +261,7 @@ class TaylorF2():
         else:
             self._tidal_ = False
         self._eval_ = False
+        self.PN_phase = PN_phase
 
     def isco(self,mode='static'):
         """
@@ -290,7 +293,7 @@ class TaylorF2():
         
         :rtype: float
         """
-        fmin = 4.149e-5*(obs_time)**(-3/8)*(self.M_c*1e-6)**(-5/8)
+        fmin = 4.149e-5*(obs_time)**(-3/8)*(self.M_c*1e-6/rsun)**(-5/8)
         return fmin
 
     def __call__(self,f):
@@ -307,7 +310,7 @@ class TaylorF2():
             self._eval_ = True
             params = {k:self.__dict__[k] for k in self.keys}
             ## phase
-            self.phase_eval = self._phase_().subs(params)
+            self.phase_eval = self._phase_(PN=self.PN_phase).subs(params)
             self.phase_eval = sp.lambdify('f',self.phase_eval,modules='numpy')
             ## amplitude
             self.amplitude_eval = self._amplitude_().subs(params)
@@ -356,7 +359,7 @@ class TaylorF2():
         keys.remove(argument)
         params = {k:self.__dict__[k] for k in keys}
         ## phase
-        ph_diff = self._phase_().subs(params)
+        ph_diff = self._phase_(PN=self.PN_phase).subs(params)
         ## change some variable in log scale
         if argument in log_scale_keys:
             ph_diff = ph_diff.subs({argument:'exp(%s)'%argument})
