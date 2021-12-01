@@ -7,7 +7,7 @@ G = 6.6743e-11 ## m^3/kg/s from <https://physics.nist.gov/cuu/Constants/index.ht
 ## Megaparsec
 Mpc = 3.0857e22 ## m
 
-## comsological parameteres from
+## cosmological parameteres from
 ## Planck 2018 results VI, Tab.1
 ## https://arxiv.org/abs/1807.06209
 omega_matter = 0.31
