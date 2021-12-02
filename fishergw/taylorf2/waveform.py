@@ -215,8 +215,7 @@ class TaylorF2():
     [1] Maggiore, Michele. Gravitational waves: Volume 1: Theory and experiments. Vol. 1. Oxford university press, 2008.
     """
 
-    def __init__(self,obj1,obj2,d_L=100.0,t_c=0.0,phi_c=0.0,redshift=False,\
-                PN_phase=3.5):
+    def __init__(self,obj1,obj2,d_L=100.0,t_c=0.0,phi_c=0.0,redshift=False,PN_phase=3.5):
         """
         
         :param obj1: Primary compact object in the binary.
@@ -236,6 +235,9 @@ class TaylorF2():
 
         :param redshift: If ``True``, the masses are redshifted, otherwise the redshift is neglected.
         :type redshift: bool, default=False
+        
+        :parama PN_phase: The PN order up to wich the waveform phase is expanded. It does not include tidal terms at 5PN and 6PN orders. They are activated whenever `obj1` or `obj2` have a nonvanishing tidal Love number.
+        :type redshift: (half-)integer, default=3.5
         """
         if redshift:
             self.redshift = redshift_from_distance(d_L)

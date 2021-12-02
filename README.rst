@@ -1,6 +1,6 @@
 About
 -----
-A Python package to compute Fisher matrices for gravtational wave models
+A Python package to compute Fisher matrices for gravitational wave models
 
 Installation
 ------------

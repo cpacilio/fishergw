@@ -1,7 +1,8 @@
 **/__pycache__
 **/.ipynb_checkpoints
 fishergw_test.ipynb
-/fishergw/taylorf2/waveform-Copy1.py
+/fishergw/taylorf2/waveform_andrea.py
+/fishergw/taylorf2/waveform_old.py
 
 # Compiled python modules.
 *.pyc
