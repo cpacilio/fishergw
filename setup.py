@@ -14,7 +14,7 @@ def readme():
 
 if __name__=='__main__':
     setup(name='fishergw',
-          version='0.0.1',
+          version='0.0.2',
           description='A Python package to compute Fisher matrices for gravtational wave models',
           long_description=readme(),
           url='https://github.com/costa-pacilio/fishergw.git',

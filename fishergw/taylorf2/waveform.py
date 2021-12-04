@@ -201,7 +201,7 @@ class TaylorF2():
 
         **delta_Lambda** *(float)* -- Auxiliary tidal parameter, according to Eq. (15) in https://arxiv.org/abs/1410.8866.
     
-        **keys** *(list)*-- Independent variables w.r.t. which the Fisher matrix is evaluated. Defaults ``['t_c','phi_c','M_c','eta','chi_s','chi_a']`` If ``Lambda_T`` is not zero, ``['Lamda_T','delta_Lamda']`` are added to keys.
+        **keys** *(list)*-- Independent variables w.r.t. which the Fisher matrix is evaluated. Defaults ``['t_c','phi_c','M_c','eta','chi_s','chi_a']``. If ``Lambda_T`` is not zero, ``['Lamda_T','delta_Lamda']`` are added to keys.
 
     .. note::
     

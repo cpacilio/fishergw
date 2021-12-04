@@ -171,7 +171,7 @@ References:
                     #warnings.warn(warning_message)
         return fm
     
-    def _invert_matrix_(self,fm,tol=1e-6):
+    def invert_matrix(self,fm,tol=1e-6):
         """
         Returns the inverse of the \Fisher matrix. A singular value decomposition is applied and directions with singular values smaller than ``tol`` are discarded.
 
@@ -197,7 +197,7 @@ References:
     
     def covariance_matrix(self,fm,svd=True):
         """
-        Returns the covariance matrix.
+        Returns the covariance matrix. If `svd`, the Fisher matrix is inverted with a singular value decomposition.
 
         :param fm: The \Fisher matrix.
         :type fm: :class:`numpy.array`, shape ``(len(keys),len(keys))``
@@ -205,14 +205,14 @@ References:
         :rtype: :class:`numpy.array`, shape ``(len(keys),len(keys))``
         """
         if svd:
-            inverse_fm = self._invert_matrix_(fm)
+            inverse_fm = self.invert_matrix(fm)
         else:
             inverse_fm = np.matrix(fm).I
         return inverse_fm
     
     def correlation_matrix(self,fm,svd=True):
         """
-        Returns the covariance matrix.
+        Returns the correlation matrix. If `svd`, the Fisher matrix is inverted with a singular value decomposition.
 
         :param fm: The \Fisher matrix.
         :type fm: :class:`numpy.array`, shape ``(len(keys),len(keys))``
@@ -220,7 +220,7 @@ References:
         :rtype: :class:`numpy.array`, shape ``(len(keys),len(keys))``
         """
         if svd:
-            inverse_fm = self._invert_matrix_(fm)
+            inverse_fm = self.invert_matrix(fm)
         else:
             inverse_fm = np.matrix(fm).I
         corr = np.zeros_like(inverse_fm)
@@ -234,7 +234,8 @@ References:
     
     def sigma1d(self,fm,svd=True):
         """
-        Returns the standard deviations of the 1D marginalized posteriors.
+        Returns the standard deviations of the 1D marginalized posteriors. If `svd`, the Fisher matrix is inverted with a singular value decomposition.
+
 
         :param fm: The \Fisher matrix.
         :type fm: :class:`numpy.array`, shape ``(len(keys),len(keys))``
@@ -243,7 +244,7 @@ References:
         :rtype: dict
         """
         if svd:
-            inverse_fm = self._invert_matrix_(fm)
+            inverse_fm = self.invert_matrix(fm)
         else:
             inverse_fm = np.matrix(fm).I
         dim = len(fm)
