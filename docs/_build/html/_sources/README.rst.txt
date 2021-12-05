@@ -2,6 +2,8 @@ About
 -----
 A Python package to compute Fisher matrices for gravitational wave models
 
+`Documentation <https://fishergw.readthedocs.io/en/latest/>`_
+
 Installation
 ------------
 Install from folder::
@@ -24,7 +26,7 @@ Usage of taylorf2
     >>> obj2 = CompactObject(m2,s2,Lamda=474)
     >>> signal = TaylorF2(obj1,obj2,DL=DL,redshift=True)
     >>>
-    >>> keys=['t_c','phi_c','M_c','eta','Lamda','Lamda_2','chi_s','chi_a']
+    >>> keys=['t_c','phi_c','M_c','eta','Lamda_T','delta_Lamda','chi_s','chi_a']
     >>> fisher = Fisher(signal,detector='ET',keys=keys,\
     >>>         keys=keys,log_scale_keys=['M_c','eta'])
     >>> fmin = 5
