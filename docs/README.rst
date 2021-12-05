@@ -4,6 +4,8 @@ A Python package to compute Fisher matrices for gravitational wave models
 
 `Documentation <https://fishergw.readthedocs.io/en/latest/>`_
 
+`GitHub Source <https://github.com/cpacilio/fishergw>`_
+
 Installation
 ------------
 Install from folder::

@@ -42,7 +42,6 @@
     
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="setup module" href="setup.html" />
     <link rel="prev" title="fishergw.cosmology package" href="fishergw.cosmology.html" /> 
 </head>
 
@@ -101,12 +100,9 @@
 <li class="toctree-l4 current"><a class="current reference internal" href="#">fishergw.taylorf2 package</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="fishergw.html#submodules">Submodules</a></li>
 <li class="toctree-l3"><a class="reference internal" href="fishergw.html#module-fishergw.constants">fishergw.constants module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="fishergw.html#module-fishergw">Module contents</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="setup.html">setup module</a></li>
 </ul>
 </li>
 </ul>
@@ -485,267 +481,6 @@
 </dd></dl>
 
 </div>
-<div class="section" id="module-fishergw.taylorf2.waveform_andrea">
-<span id="fishergw-taylorf2-waveform-andrea-module"></span><h2>fishergw.taylorf2.waveform_andrea module<a class="headerlink" href="#module-fishergw.taylorf2.waveform_andrea" title="Permalink to this headline">¶</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="fishergw.taylorf2.waveform_andrea.CompactObject">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">fishergw.taylorf2.waveform_andrea.</span></span><span class="sig-name descname"><span class="pre">CompactObject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mass</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Lamda</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kappa</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fishergw/taylorf2/waveform_andrea.html#CompactObject"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fishergw.taylorf2.waveform_andrea.CompactObject" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>A class to define an isolated compact object.</p>
-<dl>
-<dt>Attributes:</dt><dd><p><strong>mass</strong> <em>(float)</em> – Mass [<span class="math notranslate nohighlight">\(M_\odot\)</span>].</p>
-<p><strong>spin</strong> <em>(float)</em> – Dimensionless spin.</p>
-<p><strong>Lamda</strong> <em>(float)</em> – Dimensionless tidal deformability.</p>
-<p><strong>kappa</strong> <em>(float)</em> – Dimensionless spin-induced quadrupole moment.</p>
-</dd>
-</dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="fishergw.taylorf2.waveform_andrea.CompactObject.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mass</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Lamda</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kappa</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fishergw/taylorf2/waveform_andrea.html#CompactObject.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fishergw.taylorf2.waveform_andrea.CompactObject.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>mass</strong> (<em>float</em>) – Mass [<span class="math notranslate nohighlight">\(M_\odot\)</span>].</p></li>
-<li><p><strong>spin</strong> (<em>float</em>) – Dimensionless spin.</p></li>
-<li><p><strong>Lamda</strong> (<em>float</em><em>, </em><em>default=0.0</em>) – Tidal deformability. Defaults to the black hole value.</p></li>
-<li><p><strong>kappa</strong> (<em>float</em><em>, </em><em>default=1.0</em>) – Dimensionless spin-induced quadrupole moment. Defaults to the black hole value.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="fishergw.taylorf2.waveform_andrea.TaylorF2">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">fishergw.taylorf2.waveform_andrea.</span></span><span class="sig-name descname"><span class="pre">TaylorF2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d_L</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_c</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi_c</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">redshift</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PN_phase</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3.5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fishergw/taylorf2/waveform_andrea.html#TaylorF2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fishergw.taylorf2.waveform_andrea.TaylorF2" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>TaylorF2 frequency-domain template for the inspiral waveform from a binary coalescence.</p>
-<dl>
-<dt>Attributes:</dt><dd><p><strong>d_L</strong> <em>(float)</em> – Luminosity distance [Mpc].</p>
-<p><strong>t_c</strong> <em>(float)</em> – Time of coalescence.</p>
-<p><strong>phi_c</strong> <em>(float)</em> – Phase of coalescence.</p>
-<p><strong>M</strong> <em>(float)</em> – Total mass in the detector frame [m].</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>In <a class="reference internal" href="#fishergw.taylorf2.waveform_andrea.TaylorF2" title="fishergw.taylorf2.waveform_andrea.TaylorF2"><code class="xref py py-class docutils literal notranslate"><span class="pre">TaylorF2</span></code></a>, masses are transformed in units of meters as <span class="math notranslate nohighlight">\(MG/c^2\)</span>.</p>
-</div>
-<p><strong>kappa_s</strong> <em>(float)</em> – Symmetrized quadrupole moment.</p>
-<p><strong>kappa_a</strong> <em>(float)</em> – Antisymmetrized quadrupole moment.</p>
-<p><strong>eta</strong> <em>(float)</em> – Symmetric mass ratio.</p>
-<p><strong>M_c</strong> <em>(float)</em> – Chirp mass in the detector frame [m].</p>
-<p><strong>q</strong> <em>(float)</em> – Mass ratio <code class="docutils literal notranslate"><span class="pre">obj1.mass/obj2.mass</span></code>.</p>
-<p><strong>chi_s</strong> <em>(float)</em> – Symmetrized dimensionless spin.</p>
-<p><strong>chi_a</strong> <em>(float)</em> – Antisymmetrized dimensionless spin.</p>
-<p><strong>Lamda_T</strong> <em>(float)</em> – Dimensionless tidal deformability of the binary, according to Eq. (14) in <a class="reference external" href="https://arxiv.org/abs/1410.8866">https://arxiv.org/abs/1410.8866</a>.</p>
-<p><strong>delta_Lambda</strong> <em>(float)</em> – Auxiliary tidal parameter, according to Eq. (15) in <a class="reference external" href="https://arxiv.org/abs/1410.8866">https://arxiv.org/abs/1410.8866</a>.</p>
-<p><strong>keys</strong> <em>(list)</em>– Independent variables w.r.t. which the Fisher matrix is evaluated. Defaults <code class="docutils literal notranslate"><span class="pre">['t_c','phi_c','M_c','eta','chi_s','chi_a']</span></code> If <code class="docutils literal notranslate"><span class="pre">Lambda_T</span></code> is not zero, <code class="docutils literal notranslate"><span class="pre">['Lamda_T','delta_Lamda']</span></code> are added to keys.</p>
-</dd>
-</dl>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Because the TaylorF2 phase is linear in <code class="docutils literal notranslate"><span class="pre">t_c</span></code> and <code class="docutils literal notranslate"><span class="pre">phi_c</span></code>, the actual values of <code class="docutils literal notranslate"><span class="pre">t_c</span></code> and <code class="docutils literal notranslate"><span class="pre">phi_c</span></code> are irrelevant to the computation of the Fisher matrix and can be left to their default.</p>
-</div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>TaylorF2 assumes that the normalization of Eq. (7.177) in [1], without the angular factor Q.</p>
-</div>
-<p>References:</p>
-<p>[1] Maggiore, Michele. Gravitational waves: Volume 1: Theory and experiments. Vol. 1. Oxford university press, 2008.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="fishergw.taylorf2.waveform_andrea.TaylorF2.__call__">
-<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fishergw/taylorf2/waveform_andrea.html#TaylorF2.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fishergw.taylorf2.waveform_andrea.TaylorF2.__call__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the value of the strain at a given frequency.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>f</strong> (<em>float</em>) – Frequency [Hz].</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>complex</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="fishergw.taylorf2.waveform_andrea.TaylorF2.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d_L</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_c</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi_c</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">redshift</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PN_phase</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3.5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fishergw/taylorf2/waveform_andrea.html#TaylorF2.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fishergw.taylorf2.waveform_andrea.TaylorF2.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>obj1</strong> (<a class="reference internal" href="#fishergw.taylorf2.waveform_andrea.CompactObject" title="fishergw.taylorf2.waveform_andrea.CompactObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">CompactObject</span></code></a>) – Primary compact object in the binary.</p></li>
-<li><p><strong>obj2</strong> (<a class="reference internal" href="#fishergw.taylorf2.waveform_andrea.CompactObject" title="fishergw.taylorf2.waveform_andrea.CompactObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">CompactObject</span></code></a>) – Secondary compact object in the binary.</p></li>
-<li><p><strong>d_L</strong> (<em>float</em><em>, </em><em>default=100.0</em>) – Luminosity distance [Mpc].</p></li>
-<li><p><strong>t_c</strong> (<em>float</em><em>, </em><em>default=0.0</em>) – Time of coalescence.</p></li>
-<li><p><strong>phi_c</strong> (<em>float</em><em>, </em><em>default=0.0</em>) – Phase of coalescence.</p></li>
-<li><p><strong>redshift</strong> (<em>bool</em><em>, </em><em>default=False</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, the masses are redshifted, otherwise the redshift is neglected.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="fishergw.taylorf2.waveform_andrea.TaylorF2.isco">
-<span class="sig-name descname"><span class="pre">isco</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'static'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fishergw/taylorf2/waveform_andrea.html#TaylorF2.isco"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fishergw.taylorf2.waveform_andrea.TaylorF2.isco" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the ISCO frequency of the system.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>mode</strong> (<em>str</em><em>, </em><em>default='static'</em>) – If <code class="docutils literal notranslate"><span class="pre">static</span></code>, neglects the contribution of the indivudal spins. Currently, this is the only supported option.</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>float</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="fishergw.taylorf2.waveform_andrea.TaylorF2.start_frequency_from_obs_time">
-<span class="sig-name descname"><span class="pre">start_frequency_from_obs_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obs_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fishergw/taylorf2/waveform_andrea.html#TaylorF2.start_frequency_from_obs_time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fishergw.taylorf2.waveform_andrea.TaylorF2.start_frequency_from_obs_time" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the starting frequency given the osbervational time, as per Eq. (2.15) in <a class="reference external" href="https://arxiv.org/abs/gr-qc/0411129v2">https://arxiv.org/abs/gr-qc/0411129v2</a>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>obs_time</strong> (<em>float</em><em>, </em><em>default=1.0</em>) – The observational time [yr].</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>float</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-</div>
-<div class="section" id="module-fishergw.taylorf2.waveform_old">
-<span id="fishergw-taylorf2-waveform-old-module"></span><h2>fishergw.taylorf2.waveform_old module<a class="headerlink" href="#module-fishergw.taylorf2.waveform_old" title="Permalink to this headline">¶</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="fishergw.taylorf2.waveform_old.CompactObject">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">fishergw.taylorf2.waveform_old.</span></span><span class="sig-name descname"><span class="pre">CompactObject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mass</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Lamda</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kappa</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fishergw/taylorf2/waveform_old.html#CompactObject"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fishergw.taylorf2.waveform_old.CompactObject" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>A class to define an isolated compact object.</p>
-<dl>
-<dt>Attributes:</dt><dd><p><strong>mass</strong> <em>(float)</em> – Mass [<span class="math notranslate nohighlight">\(M_\odot\)</span>].</p>
-<p><strong>spin</strong> <em>(float)</em> – Dimensionless spin.</p>
-<p><strong>Lamda</strong> <em>(float)</em> – Dimensionless tidal deformability.</p>
-<p><strong>kappa</strong> <em>(float)</em> – Dimensionless spin-induced quadrupole moment.</p>
-</dd>
-</dl>
-<dl class="py method">
-<dt class="sig sig-object py" id="fishergw.taylorf2.waveform_old.CompactObject.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mass</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Lamda</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kappa</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fishergw/taylorf2/waveform_old.html#CompactObject.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fishergw.taylorf2.waveform_old.CompactObject.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>mass</strong> (<em>float</em>) – Mass [<span class="math notranslate nohighlight">\(M_\odot\)</span>].</p></li>
-<li><p><strong>spin</strong> (<em>float</em>) – Dimensionless spin.</p></li>
-<li><p><strong>Lamda</strong> (<em>float</em><em>, </em><em>default=0.0</em>) – Tidal deformability. Defaults to the black hole value.</p></li>
-<li><p><strong>kappa</strong> (<em>float</em><em>, </em><em>default=1.0</em>) – Dimensionless spin-induced quadrupole moment. Defaults to the black hole value.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="fishergw.taylorf2.waveform_old.TaylorF2">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">fishergw.taylorf2.waveform_old.</span></span><span class="sig-name descname"><span class="pre">TaylorF2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d_L</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_c</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi_c</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">redshift</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fishergw/taylorf2/waveform_old.html#TaylorF2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fishergw.taylorf2.waveform_old.TaylorF2" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>TaylorF2 frequency-domain template for the inspiral waveform from a binary coalescence.</p>
-<dl>
-<dt>Attributes:</dt><dd><p><strong>d_L</strong> <em>(float)</em> – Luminosity distance [Mpc].</p>
-<p><strong>t_c</strong> <em>(float)</em> – Time of coalescence.</p>
-<p><strong>phi_c</strong> <em>(float)</em> – Phase of coalescence.</p>
-<p><strong>M</strong> <em>(float)</em> – Total mass in the detector frame [m].</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>In <a class="reference internal" href="#fishergw.taylorf2.waveform_old.TaylorF2" title="fishergw.taylorf2.waveform_old.TaylorF2"><code class="xref py py-class docutils literal notranslate"><span class="pre">TaylorF2</span></code></a>, masses are transformed in units of meters as <span class="math notranslate nohighlight">\(MG/c^2\)</span>.</p>
-</div>
-<p><strong>kappa_s</strong> <em>(float)</em> – Symmetrized quadrupole moment.</p>
-<p><strong>kappa_a</strong> <em>(float)</em> – Antisymmetrized quadrupole moment.</p>
-<p><strong>eta</strong> <em>(float)</em> – Symmetric mass ratio.</p>
-<p><strong>M_c</strong> <em>(float)</em> – Chirp mass in the detector frame [m].</p>
-<p><strong>q</strong> <em>(float)</em> – Mass ratio <code class="docutils literal notranslate"><span class="pre">obj1.mass/obj2.mass</span></code>.</p>
-<p><strong>chi_s</strong> <em>(float)</em> – Symmetrized dimensionless spin.</p>
-<p><strong>chi_a</strong> <em>(float)</em> – Antisymmetrized dimensionless spin.</p>
-<p><strong>Lamda_T</strong> <em>(float)</em> – Dimensionless tidal deformability of the binary, according to Eq. (14) in <a class="reference external" href="https://arxiv.org/abs/1410.8866">https://arxiv.org/abs/1410.8866</a>.</p>
-<p><strong>delta_Lambda</strong> <em>(float)</em> – Auxiliary tidal parameter, according to Eq. (15) in <a class="reference external" href="https://arxiv.org/abs/1410.8866">https://arxiv.org/abs/1410.8866</a>.</p>
-<p><strong>keys</strong> <em>(list)</em>– Independent variables w.r.t. which the Fisher matrix is evaluated. Defaults <code class="docutils literal notranslate"><span class="pre">['t_c','phi_c','M_c','eta','chi_s','chi_a']</span></code> If <code class="docutils literal notranslate"><span class="pre">Lambda_T</span></code> is not zero, <code class="docutils literal notranslate"><span class="pre">['Lamda_T','delta_Lamda']</span></code> are added to keys.</p>
-</dd>
-</dl>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Because the TaylorF2 phase is linear in <code class="docutils literal notranslate"><span class="pre">t_c</span></code> and <code class="docutils literal notranslate"><span class="pre">phi_c</span></code>, the actual values of <code class="docutils literal notranslate"><span class="pre">t_c</span></code> and <code class="docutils literal notranslate"><span class="pre">phi_c</span></code> are irrelevant to the computation of the Fisher matrix and can be left to their default.</p>
-</div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>TaylorF2 assumes that the normalization of Eq. (7.177) in [1], without the angular factor Q.</p>
-</div>
-<p>References:</p>
-<p>[1] Maggiore, Michele. Gravitational waves: Volume 1: Theory and experiments. Vol. 1. Oxford university press, 2008.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="fishergw.taylorf2.waveform_old.TaylorF2.__call__">
-<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fishergw/taylorf2/waveform_old.html#TaylorF2.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fishergw.taylorf2.waveform_old.TaylorF2.__call__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the value of the strain at a given frequency.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>f</strong> (<em>float</em>) – Frequency [Hz].</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>complex</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="fishergw.taylorf2.waveform_old.TaylorF2.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d_L</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_c</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi_c</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">redshift</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fishergw/taylorf2/waveform_old.html#TaylorF2.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fishergw.taylorf2.waveform_old.TaylorF2.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>obj1</strong> (<a class="reference internal" href="#fishergw.taylorf2.waveform_old.CompactObject" title="fishergw.taylorf2.waveform_old.CompactObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">CompactObject</span></code></a>) – Primary compact object in the binary.</p></li>
-<li><p><strong>obj2</strong> (<a class="reference internal" href="#fishergw.taylorf2.waveform_old.CompactObject" title="fishergw.taylorf2.waveform_old.CompactObject"><code class="xref py py-class docutils literal notranslate"><span class="pre">CompactObject</span></code></a>) – Secondary compact object in the binary.</p></li>
-<li><p><strong>d_L</strong> (<em>float</em><em>, </em><em>default=100.0</em>) – Luminosity distance [Mpc].</p></li>
-<li><p><strong>t_c</strong> (<em>float</em><em>, </em><em>default=0.0</em>) – Time of coalescence.</p></li>
-<li><p><strong>phi_c</strong> (<em>float</em><em>, </em><em>default=0.0</em>) – Phase of coalescence.</p></li>
-<li><p><strong>redshift</strong> (<em>bool</em><em>, </em><em>default=False</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, the masses are redshifted, otherwise the redshift is neglected.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="fishergw.taylorf2.waveform_old.TaylorF2.isco">
-<span class="sig-name descname"><span class="pre">isco</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'static'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fishergw/taylorf2/waveform_old.html#TaylorF2.isco"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fishergw.taylorf2.waveform_old.TaylorF2.isco" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the ISCO frequency of the system.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>mode</strong> (<em>str</em><em>, </em><em>default='static'</em>) – If <code class="docutils literal notranslate"><span class="pre">static</span></code>, neglects the contribution of the indivudal spins. Currently, this is the only supported option.</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>float</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="fishergw.taylorf2.waveform_old.TaylorF2.start_frequency_from_obs_time">
-<span class="sig-name descname"><span class="pre">start_frequency_from_obs_time</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obs_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fishergw/taylorf2/waveform_old.html#TaylorF2.start_frequency_from_obs_time"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fishergw.taylorf2.waveform_old.TaylorF2.start_frequency_from_obs_time" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the starting frequency given the osbervational time, as per Eq. (2.15) in <a class="reference external" href="https://arxiv.org/abs/gr-qc/0411129v2">https://arxiv.org/abs/gr-qc/0411129v2</a>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>obs_time</strong> (<em>float</em><em>, </em><em>default=1.0</em>) – The observational time [yr].</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>float</p>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-</div>
-<div class="section" id="module-fishergw.taylorf2">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-fishergw.taylorf2" title="Permalink to this headline">¶</a></h2>
-</div>
 </div>
 
 
@@ -754,7 +489,6 @@
           </div>
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="setup.html" class="btn btn-neutral float-right" title="setup module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
         <a href="fishergw.cosmology.html" class="btn btn-neutral float-left" title="fishergw.cosmology package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
