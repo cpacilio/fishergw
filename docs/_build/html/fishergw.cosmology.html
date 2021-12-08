@@ -205,16 +205,12 @@
 <p>Uses the Planck 2018 cosmological parameters from Tab. 1 in <a class="reference external" href="https://arxiv.org/abs/1807.06209">https://arxiv.org/abs/1807.06209</a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>d_L</strong> (<em>float</em>) – Luminosity distance [Mpc]. Must be less than 231518.</p>
+<dd class="field-odd"><p><strong>d_L</strong> (<em>float</em>) – Luminosity distance [Mpc]. Must be no less than 1.</p>
 </dd>
 <dt class="field-even">Return type</dt>
 <dd class="field-even"><p>float</p>
 </dd>
 </dl>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>A solution for z is searched in the interval [0,20]. This restricts the allowed values of d_L in [0,231518] Mpc.</p>
-</div>
 </dd></dl>
 
 </div>
