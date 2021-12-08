@@ -9,11 +9,3 @@ Subpackages
 
    fishergw.cosmology
    fishergw.taylorf2
-
-fishergw.constants module
--------------------------
-
-.. automodule:: fishergw.constants
-   :members:
-   :undoc-members:
-   :show-inheritance:

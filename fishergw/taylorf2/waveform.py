@@ -236,7 +236,7 @@ class TaylorF2():
         :param redshift: If ``True``, the masses are redshifted, otherwise the redshift is neglected.
         :type redshift: bool, default=False
         
-        :parama PN_phase: The PN order up to wich the waveform phase is expanded. It does not include tidal terms at 5PN and 6PN orders. They are activated whenever `obj1` or `obj2` have a nonvanishing tidal Love number.
+        :param PN_phase: The PN order up to wich the waveform phase is expanded. It does not include tidal terms at 5PN and 6PN orders. They are activated whenever `obj1` or `obj2` have a nonvanishing tidal Love number.
         :type redshift: (half-)integer, default=3.5
         """
         if redshift:
