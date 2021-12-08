@@ -11,3 +11,11 @@ fishergw.cosmology.redshift\_distance module
    :members:
    :undoc-members:
    :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: fishergw.cosmology
+   :members:
+   :undoc-members:
+   :show-inheritance:
