@@ -414,8 +414,11 @@ class TaylorF2():
             out += cfs[i]*v**i
         ## add tidal terms
         if self._tidal_ == True:
-            out += -Rational(39,2)*Lamda_T*v**10 -Rational(3115,64)*Lamda_T*v**12\
-            + Rational(6595,364)*delta*delta_Lamda*v**12
+            ## add 5PN term
+            out += -Rational(39,2)*Lamda_T*v**10 
+            ## add 6PN term
+            out += -Rational(3115,64)*Lamda_T*v**12\
+                + Rational(6595,364)*delta*delta_Lamda*v**12
         ## add normalization
         out *= 3/(128*eta*v**5)
         ## add constant and linear terms in the phase
