@@ -1,9 +1,6 @@
 fishergw.taylorf2 package
 =========================
 
-Submodules
-----------
-
 fishergw.taylorf2.fisher module
 -------------------------------
 

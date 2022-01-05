@@ -5,4 +5,3 @@ fishergw
    :maxdepth: 4
 
    fishergw
-   setup
