@@ -2,7 +2,7 @@ import numpy as np
 import sympy as sp
 from sympy import Rational
 from copy import deepcopy
-
+from scipy.interpolate import interp1d
 from ..cosmology.redshift_distance import redshift_from_distance
 from ..constants import speed_of_light, solar_mass, G, Mpc
 
@@ -268,9 +268,8 @@ class TaylorF2():
     def isco(self,mode='static'):
         """
         Returns the ISCO frequency of the system.
-
         
-        :param mode: If ``static``, neglects the contribution of the indivudal spins. Currently, this is the only supported option.
+        :param mode: If ``static``, neglects the contribution of the indivudal spins. If 'Kerr', uses the Kerr ISCO with gravitational self-force corrections and test-particle spin corrections from https://arxiv.org/abs/1010.2553. Currently, these are the only supported options.
         :type mode: str, default='static'
 
         :rtype: float
@@ -278,11 +277,35 @@ class TaylorF2():
         #Notes
         #-----
         #This method is under development. To do list:
-        #-- add an isco-Kerr option;
         #-- implement the contact frequency for non-black hole objects.
         
         if mode == 'static':
             fmax = cc/(self.M*6**1.5*np.pi)
+        if mode == 'Kerr':
+            ## compute 0th order expression
+            chi1 = self.chi_s + self.chi_a
+            chi2 = self.chi_s - self.chi_a
+            Z1 = 1+(1-chi1**2)**(1/3)*((1+chi1)**(1/3)+(1-chi1)**(1/3))
+            Z2 = (3*chi1**2+Z1**2)**0.5
+            risco = 3+Z2-np.sign(chi1)*((3-Z1)*(3+Z1+2*Z2))**0.5
+            if chi1:
+                Omega = np.sign(chi1)/(risco**1.5+chi1)/self.M
+            else:
+                Omega = 1/risco**1.5/self.M
+            ## add gravitational self-force and test-particle spin corrections
+            spins = np.array([-0.99,-0.9,-0.8,-0.7,-0.6,-0.5,-0.4,-0.3,-0.2,-0.1,0.,\
+                    0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,0.99])
+            c_gsf = np.array([1.1903,1.1961,1.2043,1.2148,1.2282,1.2453,1.2670,1.2948,\
+                    1.3303,1.3759,1.4349,1.5116,1.6118,1.7434,1.9167,2.1441,2.4388,\
+                    2.8098,3.2524,3.7337,4.144])
+            c_cospin = np.array([0.1945,0.202,0.211,0.2205,0.2308,0.2417,0.2534,0.2657,\
+                    0.2788,0.2923,0.3062,0.3199,0.3328,0.3435,0.3502,0.3499,0.3382,0.3097,\
+                    0.259,0.1837,0.0983])
+            gsf = interp1d(spins,c_gsf)
+            cospin = interp1d(spins,c_cospin)
+            Omega *= 1 + self.eta*gsf(chi1) + self.eta*chi2*cospin(chi1)
+            ## frequency
+            fmax = cc*Omega/np.pi
         return fmax
 
     def start_frequency_from_obs_time(self,obs_time=1.0):

@@ -32,9 +32,9 @@ Usage of taylorf2
     >>> fmin = 5
     >>> fmax = signal.isco(mode='static')
     >>>
-    >>> snr = fisher.snr(fmin,fmax,nbins=int(1e4))
+    >>> snr = fisher.snr(fmin,fmax,nbins=int(1e5))
     >>> priors = {'chi_s':0.05,'chi_a':0.05}
-    >>> fm = fisher.fisher_matrix(fmin,fmax,nbins=int(1e4),priors=priors)
+    >>> fm = fisher.fisher_matrix(fmin,fmax,nbins=int(1e5),priors=priors)
     >>> cov = fisher.covariance_matrix(fm)
     >>> sigma = fisher.sigma1d(fm,svd=True)
 
