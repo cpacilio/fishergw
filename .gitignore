@@ -6,6 +6,8 @@ Untitled.ipynb
 /fishergw/taylorf2/waveform_old.py
 /fishergw/taylorf2/waveform_bs.py
 
+.readthedocs.yaml
+
 # Compiled python modules.
 *.pyc
 
