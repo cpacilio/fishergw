@@ -6,10 +6,10 @@
 version: 2
 
 # Set the version of Python and other tools you might need
-build:
-  os: ubuntu-18.04.5
-  tools:
-    python: "3.8.8"
+#build:
+#  os: ubuntu-18.04.5
+#  tools:
+#    python: "3.8.8"
     # You can also specify other tool versions:
     # nodejs: "16"
     # rust: "1.55"
