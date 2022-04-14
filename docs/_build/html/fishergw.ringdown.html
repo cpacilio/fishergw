@@ -1,0 +1,709 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>fishergw.ringdown package &mdash; fishergw 0.0.2 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="fishergw.taylorf2 package" href="fishergw.taylorf2.html" />
+    <link rel="prev" title="fishergw.cosmology package" href="fishergw.cosmology.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> fishergw
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">fishergw</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="fishergw.html">fishergw package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="fishergw.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="fishergw.cosmology.html">fishergw.cosmology package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">fishergw.ringdown package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fishergw.taylorf2.html">fishergw.taylorf2 package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">fishergw</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="modules.html">fishergw</a> &raquo;</li>
+        
+          <li><a href="fishergw.html">fishergw package</a> &raquo;</li>
+        
+      <li>fishergw.ringdown package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/fishergw.ringdown.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="fishergw-ringdown-package">
+<h1>fishergw.ringdown package<a class="headerlink" href="#fishergw-ringdown-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-fishergw.ringdown.fisher">
+<span id="fishergw-ringdown-fisher-module"></span><h2>fishergw.ringdown.fisher module<a class="headerlink" href="#module-fishergw.ringdown.fisher" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="fishergw.ringdown.fisher.Fisher">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">fishergw.ringdown.fisher.</span></span><span class="sig-name descname"><span class="pre">Fisher</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">signal</span></em>, <em class="sig-param"><span class="pre">integration_method=&lt;function</span> <span class="pre">simps&gt;</span></em>, <em class="sig-param"><span class="pre">asd_name=None</span></em>, <em class="sig-param"><span class="pre">detector=None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fishergw/ringdown/fisher.html#Fisher"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fishergw.ringdown.fisher.Fisher" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<blockquote>
+<div><p>An object to load the power spectral density (PSD) and compute the signal-to-noise ratio (SNR) and the Fisher matrix elements of a gravitational wave signal. The SNR and the Fisher matrix are averaged over orientation angles. Recall that average over the inclination angle is already included in the initialization of <code class="xref py py-class docutils literal notranslate"><span class="pre">RingdownMultimode</span></code> .</p>
+<dl>
+<dt>Attributes:</dt><dd><p><strong>signal</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">RingdownMultimode</span></code>) – A <code class="xref py py-class docutils literal notranslate"><span class="pre">RingdownMultimode</span></code> waveform instance.</p>
+<p><strong>integration_method</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">scipy.integrate</span></code>) – An integration method from the <code class="xref py py-class docutils literal notranslate"><span class="pre">scipy.integrate</span></code> subpackage.</p>
+<p><strong>psd</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">scipy.interpolate.interp1d</span></code>) – Interpolant of the PSD. An instance of <code class="xref py py-class docutils literal notranslate"><span class="pre">scipy.interpolate.interp1d</span></code>.</p>
+<p><strong>fmin</strong> <em>(float)</em> – If <code class="docutils literal notranslate"><span class="pre">asd_name</span></code> is provided, <code class="docutils literal notranslate"><span class="pre">fmin</span></code> is the corresponding minimum frequency. Otherwise, <code class="docutils literal notranslate"><span class="pre">fmin</span> <span class="pre">=</span> <span class="pre">None</span></code>.</p>
+<p><strong>fmax</strong> <em>(float)</em> – If <code class="docutils literal notranslate"><span class="pre">asd_name</span></code> is provided, <code class="docutils literal notranslate"><span class="pre">fmax</span></code> is the corresponding maximum frequency. Otherwise, <code class="docutils literal notranslate"><span class="pre">fmax</span> <span class="pre">=</span> <span class="pre">None</span></code>.</p>
+<p><strong>Qavg</strong> <em>(float)</em> – Angle-averaging factor <span class="math notranslate nohighlight">\(Q\)</span>. When <a class="reference internal" href="#fishergw.ringdown.fisher.Fisher.load_psd" title="fishergw.ringdown.fisher.Fisher.load_psd"><code class="xref py py-func docutils literal notranslate"><span class="pre">load_psd()</span></code></a> is called, the PSD is divided by <span class="math notranslate nohighlight">\(Q^2\)</span> to ensure that the SNR and the Fisher matrix elements are angle-averaged.</p>
+<p><strong>_detectors_</strong> <em>(dict)</em> – Dictionary mapping built-in detectors to their <code class="docutils literal notranslate"><span class="pre">asd_name</span></code> and angle-averaging factor <span class="math notranslate nohighlight">\(Q\)</span>. Built-in detectors are Advanced Ligo (<code class="docutils literal notranslate"><span class="pre">'aligo'</span></code>), Cosmic Explorer (<code class="docutils literal notranslate"><span class="pre">'ce'</span></code>), Einstein Telescope (<code class="docutils literal notranslate"><span class="pre">'etd'</span></code>) and LISA (<code class="docutils literal notranslate"><span class="pre">'lisa'</span></code>). The following conventions hold for <span class="math notranslate nohighlight">\(Q\)</span>:</p>
+<blockquote>
+<div><p><code class="docutils literal notranslate"><span class="pre">'aLigo'</span></code> and <code class="docutils literal notranslate"><span class="pre">'ce'</span></code> are mapped to the factor <span class="math notranslate nohighlight">\(Q=1/\sqrt{5}\)</span> for a two-armed 90-degrees detector (see, e.g., Eq. (7.177) in [1]);</p>
+<p><code class="docutils literal notranslate"><span class="pre">'etd'</span></code> is mapped to <span class="math notranslate nohighlight">\(Q=1/\sqrt{5}*\sqrt{3/2}\)</span>, the additional factor <span class="math notranslate nohighlight">\(\sqrt{3/2}\)</span> coming from the fact that ET is a three-armed 60-degrees detector with two channels (see Eq. (4) in <a class="reference external" href="https://arxiv.org/abs/1012.0908">https://arxiv.org/abs/1012.0908</a>);</p>
+<p><code class="docutils literal notranslate"><span class="pre">'lisa'</span></code> is mapped to <span class="math notranslate nohighlight">\(Q=1\)</span>, because the LISA sensitivity curve is already averaged over orientation and detector channels (see Eq.s (2,8-9) in <a class="reference external" href="https://arxiv.org/abs/1803.01944">https://arxiv.org/abs/1803.01944</a>).</p>
+</div></blockquote>
+</dd>
+</dl>
+</div></blockquote>
+<p>References:</p>
+<blockquote>
+<div><p>[1] Maggiore, Michele. Gravitational waves: Volume 1: Theory and experiments. Vol. 1. Oxford university press, 2008.</p>
+</div></blockquote>
+<dl class="py method">
+<dt class="sig sig-object py" id="fishergw.ringdown.fisher.Fisher.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">signal</span></em>, <em class="sig-param"><span class="pre">integration_method=&lt;function</span> <span class="pre">simps&gt;</span></em>, <em class="sig-param"><span class="pre">asd_name=None</span></em>, <em class="sig-param"><span class="pre">detector=None</span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fishergw/ringdown/fisher.html#Fisher.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fishergw.ringdown.fisher.Fisher.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>signal</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">RingdownMultimode</span></code>) – A <code class="xref py py-class docutils literal notranslate"><span class="pre">RingdownMultimode</span></code> waveform instance.</p></li>
+<li><p><strong>integration_method</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">scipy.integrate</span></code> object) – The integration method to compute the SNR and the Fisher matrix elements. Deafult: <code class="xref py py-class docutils literal notranslate"><span class="pre">scipy.integrate.simps</span></code>.</p></li>
+<li><p><strong>asd_name</strong> (filepath or <code class="docutils literal notranslate"><span class="pre">None</span></code>, optional) – The path to a text file with the tabulated ASD. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, psd defaults to 1.0. If <code class="docutils literal notranslate"><span class="pre">detector</span></code> is not <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">asd_name</span></code> is read from the <code class="docutils literal notranslate"><span class="pre">_detectors_</span></code> internal dictionary.</p></li>
+<li><p><strong>detector</strong> (str or <code class="docutils literal notranslate"><span class="pre">None</span></code>, optional) – If not <code class="docutils literal notranslate"><span class="pre">None</span></code>, must be one of <code class="docutils literal notranslate"><span class="pre">['aligo','ce','etd,'lisa']</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fishergw.ringdown.fisher.Fisher.correlation_matrix">
+<span class="sig-name descname"><span class="pre">correlation_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">svd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fishergw/ringdown/fisher.html#Fisher.correlation_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fishergw.ringdown.fisher.Fisher.correlation_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the correlation matrix for a single (l,m) mode. If <code class="docutils literal notranslate"><span class="pre">svd</span></code>, the Fisher matrix is inverted with a singular value decomposition.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>fm</strong> – The Fisher matrix for a single (l,m) mode.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fishergw.ringdown.fisher.Fisher.covariance_matrix">
+<span class="sig-name descname"><span class="pre">covariance_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">svd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fishergw/ringdown/fisher.html#Fisher.covariance_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fishergw.ringdown.fisher.Fisher.covariance_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the covariance matrix for a single (l,m) mode. If <code class="docutils literal notranslate"><span class="pre">svd</span></code>, the Fisher matrix is inverted with a singular value decomposition.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>fm</strong> – The Fisher matrix for a single (l,m) mode.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fishergw.ringdown.fisher.Fisher.fisher_matrix">
+<span class="sig-name descname"><span class="pre">fisher_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nbins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logspace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fishergw/ringdown/fisher.html#Fisher.fisher_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fishergw.ringdown.fisher.Fisher.fisher_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the Fisher matrix. Because it is block diagonal w.r.t. (l,m), the output is a dictionary of (l,m) couples and their corresponding blocks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fmin</strong> (<em>float</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – Minimum frequency. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, defaults to the minimum frequency set by the provided ASD file.</p></li>
+<li><p><strong>fmax</strong> (<em>float</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – Maximum frequency. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, defaults to the maximum frequency set by the provided ASD file.</p></li>
+<li><p><strong>nbins</strong> (<em>float</em>) – Binning of the integration domain. Default: 1e5.</p></li>
+<li><p><strong>logspace</strong> (<em>Bool</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, integrations are performed in logspace over frequencies. Default: <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fishergw.ringdown.fisher.Fisher.invert_matrix">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">invert_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">matrix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">svd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-06</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fishergw/ringdown/fisher.html#Fisher.invert_matrix"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fishergw.ringdown.fisher.Fisher.invert_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the inverse of a matrix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>matrix</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.array</span></code>) – The input matrix.</p></li>
+<li><p><strong>svd</strong> (<em>bool</em><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> a singular value decomposition is applied and principal directions with singular values smaller than <code class="docutils literal notranslate"><span class="pre">tol</span></code> are discarded. Default: <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><strong>tol</strong> (<em>float</em>) – Directions with singular values smaller than <code class="docutils literal notranslate"><span class="pre">tol</span></code> are discarded when inverting the matrix. Default: 1e-6.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.array</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fishergw.ringdown.fisher.Fisher.load_psd">
+<span class="sig-name descname"><span class="pre">load_psd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">asd_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Qavg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logspace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fishergw/ringdown/fisher.html#Fisher.load_psd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fishergw.ringdown.fisher.Fisher.load_psd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads the PSD from a text file. Initializes the attributes <code class="docutils literal notranslate"><span class="pre">psd</span></code>, <code class="docutils literal notranslate"><span class="pre">fmin</span></code>, <code class="docutils literal notranslate"><span class="pre">fmax</span></code> and <code class="docutils literal notranslate"><span class="pre">Qavg</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>asd_name</strong> (<em>str</em>) – name of the text file containing the ASD table. The file will be first looked into the <code class="docutils literal notranslate"><span class="pre">fishergw/detector/</span></code> folder, then into the <code class="docutils literal notranslate"><span class="pre">fishergw/detector/unofficial_asd/</span></code> folder. Otherwise, <code class="docutils literal notranslate"><span class="pre">asd_name</span></code> must be the full path of the text file.</p></li>
+<li><p><strong>Qavg</strong> (<em>float</em>) – Value of the angle-averaging factor. See the description in the <a class="reference internal" href="#fishergw.ringdown.fisher.Fisher" title="fishergw.ringdown.fisher.Fisher"><code class="xref py py-class docutils literal notranslate"><span class="pre">Fisher</span></code></a> attributes. Default: 1.</p></li>
+<li><p><strong>logspace</strong> (<em>bool</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, the ASD is interpolated in logspace along the y-axis. Default: <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fishergw.ringdown.fisher.Fisher.sample">
+<span class="sig-name descname"><span class="pre">sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">covariance_matrix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nsamples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fishergw/ringdown/fisher.html#Fisher.sample"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fishergw.ringdown.fisher.Fisher.sample" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns sampled parameters for a given (l,m) from the corresponding <code class="docutils literal notranslate"><span class="pre">covariance</span> <span class="pre">matrix</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>covariance_matrix</strong> – The covariance matrix for the (l,m) modes.</p></li>
+<li><p><strong>nsamples</strong> (<em>float</em>) – Number of samples to draw. Default: 1e4.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fishergw.ringdown.fisher.Fisher.sigma1d">
+<span class="sig-name descname"><span class="pre">sigma1d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">svd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fishergw/ringdown/fisher.html#Fisher.sigma1d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fishergw.ringdown.fisher.Fisher.sigma1d" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the standard deviations of the 1D marginalized posteriors. If <code class="docutils literal notranslate"><span class="pre">svd</span></code>, the Fisher matrix is inverted with a singular value decomposition.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>fm</strong> – The Fisher matrix.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Dictionary mapping <code class="docutils literal notranslate"><span class="pre">keys</span></code> to the corresponding standard deviations.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fishergw.ringdown.fisher.Fisher.snr">
+<span class="sig-name descname"><span class="pre">snr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nbins</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logspace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fishergw/ringdown/fisher.html#Fisher.snr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fishergw.ringdown.fisher.Fisher.snr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the SNR of the signal.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fmin</strong> (<em>float</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – Minimum frequency. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, defaults to the minimum frequency set by the provided PSD file.</p></li>
+<li><p><strong>fmax</strong> (<em>float</em><em> or </em><em>None</em><em>, </em><em>optional</em>) – Maximum frequency. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, defaults to the maximum frequency set by the provided PSD file.</p></li>
+<li><p><strong>nbins</strong> (<em>float</em>) – Binning of the integration domain. Default: 1e5.</p></li>
+<li><p><strong>logspace</strong> (<em>bool</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, integration is performed in logspace over frequencies. Default: <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fishergw.ringdown.fisher.Fisher.snr_BCW">
+<span class="sig-name descname"><span class="pre">snr_BCW</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/fishergw/ringdown/fisher.html#Fisher.snr_BCW"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fishergw.ringdown.fisher.Fisher.snr_BCW" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-fishergw.ringdown.utils">
+<span id="fishergw-ringdown-utils-module"></span><h2>fishergw.ringdown.utils module<a class="headerlink" href="#module-fishergw.ringdown.utils" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="fishergw.ringdown.utils.E_isco">
+<span class="sig-prename descclassname"><span class="pre">fishergw.ringdown.utils.</span></span><span class="sig-name descname"><span class="pre">E_isco</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spin</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fishergw/ringdown/utils.html#E_isco"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fishergw.ringdown.utils.E_isco" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the dimensionless energy for a test particle at the ISCO of a Kerr black hole.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>spin</strong> (<em>float</em>) – Dimensionless spin.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fishergw.ringdown.utils.L_isco">
+<span class="sig-prename descclassname"><span class="pre">fishergw.ringdown.utils.</span></span><span class="sig-name descname"><span class="pre">L_isco</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spin</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fishergw/ringdown/utils.html#L_isco"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fishergw.ringdown.utils.L_isco" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the dimensionless angular momentum for a test particle at the ISCO of a Kerr black hole.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>spin</strong> (<em>float</em>) – Dimensionless spin.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fishergw.ringdown.utils.final_mass">
+<span class="sig-prename descclassname"><span class="pre">fishergw.ringdown.utils.</span></span><span class="sig-name descname"><span class="pre">final_mass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mass1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mass2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spin1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spin2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fishergw/ringdown/utils.html#final_mass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fishergw.ringdown.utils.final_mass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the final mass (in units of solar masses) of the Kerr black hole remnant of a quasi-circular binary black hole merger.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mass1</strong> (<em>float</em>) – Mass of the primary component [<span class="math notranslate nohighlight">\(M_\odot\)</span>].</p></li>
+<li><p><strong>mass2</strong> (<em>float</em>) – Mass of the secondary component [<span class="math notranslate nohighlight">\(M_\odot\)</span>].</p></li>
+<li><p><strong>spin1</strong> (<em>float</em>) – Dimensionless spin of the primary component.</p></li>
+<li><p><strong>spin2</strong> (<em>float</em>) – Dimensionless spin of the secondary component.</p></li>
+<li><p><strong>beta</strong> (<em>float</em>) – Angle between spin1 and the z direction. Default: 0.</p></li>
+<li><p><strong>gamma</strong> (<em>float</em>) – Angle between spin2 and the z direction. Default: 0.</p></li>
+<li><p><strong>method</strong> – If 1, uses the fit in <a class="reference external" href="https://arxiv.org/abs/1206.3803">https://arxiv.org/abs/1206.3803</a>. If 2, uses the fit in <a class="reference external" href="https://arxiv.org/abs/1508.07250">https://arxiv.org/abs/1508.07250</a>. If 3, uses the fit in <a class="reference external" href="https://arxiv.org/abs/0807.2985">https://arxiv.org/abs/0807.2985</a>. Default: 1.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fishergw.ringdown.utils.final_spin">
+<span class="sig-prename descclassname"><span class="pre">fishergw.ringdown.utils.</span></span><span class="sig-name descname"><span class="pre">final_spin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mass1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mass2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spin1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spin2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fishergw/ringdown/utils.html#final_spin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fishergw.ringdown.utils.final_spin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the dimensionless final spin of the Kerr black hole remnant of a quasi-circular binary black hole merger.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mass1</strong> (<em>float</em>) – Mass of the primary component [<span class="math notranslate nohighlight">\(M_\odot\)</span>].</p></li>
+<li><p><strong>mass2</strong> (<em>float</em>) – Mass of the secondary component [<span class="math notranslate nohighlight">\(M_\odot\)</span>].</p></li>
+<li><p><strong>spin1</strong> (<em>float</em>) – Dimensionless spin of the primary component.</p></li>
+<li><p><strong>spin2</strong> (<em>float</em>) – Dimensionless spin of the secondary component.</p></li>
+<li><p><strong>beta</strong> (<em>float</em>) – Angle between spin1 and the z direction. Default: 0.</p></li>
+<li><p><strong>gamma</strong> (<em>float</em>) – Angle between spin2 and the z direction. Default: 0.</p></li>
+<li><p><strong>method</strong> – If 1, uses the fit in <a class="reference external" href="https://arxiv.org/abs/0904.2577">https://arxiv.org/abs/0904.2577</a>. If 2, uses the fit in <a class="reference external" href="https://arxiv.org/abs/1605.01938">https://arxiv.org/abs/1605.01938</a>. If 3, uses the fit in <a class="reference external" href="https://arxiv.org/abs/1508.07250">https://arxiv.org/abs/1508.07250</a>. If 4, uses the fit in <a class="reference external" href="https://arxiv.org/abs/0807.2985">https://arxiv.org/abs/0807.2985</a>. Default: 2.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fishergw.ringdown.utils.invert_qnm_from_f">
+<span class="sig-prename descclassname"><span class="pre">fishergw.ringdown.utils.</span></span><span class="sig-name descname"><span class="pre">invert_qnm_from_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fit2'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fishergw/ringdown/utils.html#invert_qnm_from_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fishergw.ringdown.utils.invert_qnm_from_f" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the masses (in units if solar masses) and dimensionless spins compatible with a given QNM frequency, assuming it is generated from the Kerr spectrum.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>f</strong> (<em>float</em>) – freqency [Hz].</p></li>
+<li><p><strong>mode</strong> (<em>tuple</em>) – the QNM numbers (l,m,n).</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fishergw.ringdown.utils.invert_qnm_from_ff">
+<span class="sig-prename descclassname"><span class="pre">fishergw.ringdown.utils.</span></span><span class="sig-name descname"><span class="pre">invert_qnm_from_ff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fit2'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qnm_invert</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fishergw/ringdown/utils.html#invert_qnm_from_ff"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fishergw.ringdown.utils.invert_qnm_from_ff" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the mass (in units of solar masses) and the dimensionless spin corresponding to a pair of frequencies, assuming they are generated from the Kerr spectrum.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>f1</strong> (<em>float</em>) – The first frequency [Hz].</p></li>
+<li><p><strong>f2</strong> (<em>float</em>) – The second frequency [Hz].</p></li>
+<li><p><strong>mode1</strong> (<em>tuple</em>) – The set (l,m,n) of angular and overtone numbers of the first frequency.</p></li>
+<li><p><strong>mode2</strong> (<em>tuple</em>) – The set (l,m,n) of angular oand overtone numbers of the second frequency.</p></li>
+<li><p><strong>method</strong> – The method used to approximate the Kerr spectrum. See methods available in the qnm_Kerr function.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fishergw.ringdown.utils.invert_qnm_from_ftau">
+<span class="sig-prename descclassname"><span class="pre">fishergw.ringdown.utils.</span></span><span class="sig-name descname"><span class="pre">invert_qnm_from_ftau</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fit2'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qnm_invert</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fishergw/ringdown/utils.html#invert_qnm_from_ftau"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fishergw.ringdown.utils.invert_qnm_from_ftau" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the mass (in units of solar masses) and the dimensionless spin corresponding to a frequency and a damping time, assuming they are generated from the Kerr spectrum.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>f1</strong> (<em>float</em>) – The frequency [Hz].</p></li>
+<li><p><strong>f2</strong> (<em>float</em>) – The damping time [s].</p></li>
+<li><p><strong>mode1</strong> (<em>tuple</em>) – The set (l,m,n) of angular and overtone numbers of the frequency.</p></li>
+<li><p><strong>mode2</strong> (<em>tuple</em>) – The set (l,m,n) of angular oand overtone numbers of the damping time.</p></li>
+<li><p><strong>method</strong> – The method used to approximate the Kerr spectrum. See methods available in the qnm_Kerr function.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fishergw.ringdown.utils.invert_qnm_from_tau">
+<span class="sig-prename descclassname"><span class="pre">fishergw.ringdown.utils.</span></span><span class="sig-name descname"><span class="pre">invert_qnm_from_tau</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tau</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fit2'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fishergw/ringdown/utils.html#invert_qnm_from_tau"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fishergw.ringdown.utils.invert_qnm_from_tau" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the masses (in units of solar masses) and spins compatible with a given QNM damping time, assuming it is generated from the Kerr spectrum.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tau</strong> (<em>float</em>) – damping time [s].</p></li>
+<li><p><strong>mode</strong> (<em>tuple</em>) – the QNM numbers (l,m,n).</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fishergw.ringdown.utils.invert_qnm_from_tautau">
+<span class="sig-prename descclassname"><span class="pre">fishergw.ringdown.utils.</span></span><span class="sig-name descname"><span class="pre">invert_qnm_from_tautau</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tau1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tau2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'fit2'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qnm_invert</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fishergw/ringdown/utils.html#invert_qnm_from_tautau"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fishergw.ringdown.utils.invert_qnm_from_tautau" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the mass (in units of solar masses) and the dimensionless spin corresponding to a pair of damping times, assuming they are generated from the Kerr spectrum.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>f1</strong> (<em>float</em>) – The first damping time.</p></li>
+<li><p><strong>f2</strong> (<em>float</em>) – The second damping time.</p></li>
+<li><p><strong>mode1</strong> (<em>tuple</em>) – The set (l,m,n) of angular and overtone numbers of the first damping time.</p></li>
+<li><p><strong>mode2</strong> (<em>typle</em>) – The set (l,m,n) of angular oand overtone numbers of the second damping time.</p></li>
+<li><p><strong>method</strong> – The method used to approximate the Kerr spectrum. See methods available in the qnm_Kerr function.</p></li>
+</ul>
+</dd>
+</dl>
+<p>The use of <code class="docutils literal notranslate"><span class="pre">fit1</span></code> methods can be badly posed for certain combination of modes, because the ratio tau1/tau2 is not monotonic. This is just an artifact of the <code class="docutils literal notranslate"><span class="pre">fit1</span></code> method and it does not happen with other methods.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fishergw.ringdown.utils.qnm_Kerr">
+<span class="sig-prename descclassname"><span class="pre">fishergw.ringdown.utils.</span></span><span class="sig-name descname"><span class="pre">qnm_Kerr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mass</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'interp'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interp_qnm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fishergw/ringdown/utils.html#qnm_Kerr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fishergw.ringdown.utils.qnm_Kerr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the frequency and the damping time of a Kerr black hole
+for a given mass, spin and mode.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mass</strong> (<em>float</em>) – Mass of the black hole [<span class="math notranslate nohighlight">\(M_\odot\)</span>].</p></li>
+<li><p><strong>spin</strong> (<em>float</em>) – Dimensionless spin.</p></li>
+<li><p><strong>mode</strong> (<em>tuple</em>) – Angular, azimuthal and overtone number in the form (l,m,n).</p></li>
+<li><p><strong>method</strong> – The method used to approximate the Kerr spectrum. If <cite>fit1</cite>, it uses the fits provided in <a class="reference external" href="https://arxiv.org/abs/gr-qc/0512160">https://arxiv.org/abs/gr-qc/0512160</a>. If <cite>fit2</cite>, it uses the fits provided in the appendix of <a class="reference external" href="https://arxiv.org/abs/2109.13961">https://arxiv.org/abs/2109.13961</a>. If <cite>interp</cite>, it interpolates from the numerical tables provided in <a class="reference external" href="https://pages.jh.edu/eberti2/ringdown/">https://pages.jh.edu/eberti2/ringdown/</a>. Deafault: <cite>interp</cite>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fishergw.ringdown.utils.r_isco">
+<span class="sig-prename descclassname"><span class="pre">fishergw.ringdown.utils.</span></span><span class="sig-name descname"><span class="pre">r_isco</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spin</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fishergw/ringdown/utils.html#r_isco"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fishergw.ringdown.utils.r_isco" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the dimensionless ISCO radius for a given dimensionless spin.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>spin</strong> (<em>float</em>) – Dimensionless spin.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fishergw.ringdown.utils.ringdown_absolute_amplitudes">
+<span class="sig-prename descclassname"><span class="pre">fishergw.ringdown.utils.</span></span><span class="sig-name descname"><span class="pre">ringdown_absolute_amplitudes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mass_f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mass_ratio</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spin1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spin2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d_L</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fishergw/ringdown/utils.html#ringdown_absolute_amplitudes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fishergw.ringdown.utils.ringdown_absolute_amplitudes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fishergw.ringdown.utils.ringdown_relative_amplitudes">
+<span class="sig-prename descclassname"><span class="pre">fishergw.ringdown.utils.</span></span><span class="sig-name descname"><span class="pre">ringdown_relative_amplitudes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mass_ratio</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spin1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spin2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fishergw/ringdown/utils.html#ringdown_relative_amplitudes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fishergw.ringdown.utils.ringdown_relative_amplitudes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the ratio of the ringdown amplitudes relative to the amplitude of the (2,2,0) mode.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mass_ratio</strong> (<em>float</em>) – the mass ratio of the progenitor binary, defined as m1/m2&gt;1.</p></li>
+<li><p><strong>spin1</strong> (<em>float</em>) – the projection of the dimensionless spin of the first black hole component the z axis.</p></li>
+<li><p><strong>spin2</strong> (<em>float</em>) – the projection of the dimensionless spin of the second component along the z axis.</p></li>
+<li><p><strong>mode</strong> (<em>tuple</em>) – Angular, azimuthal and overtnone number in the form (l,m,n).</p></li>
+<li><p><strong>method</strong> – if 1, use fits from <a class="reference external" href="https://arxiv.org/abs/1207.0399">https://arxiv.org/abs/1207.0399</a>; if 2, use fits from <a class="reference external" href="https://arxiv.org/abs/2005.03260">https://arxiv.org/abs/2005.03260</a> in an updated form; if 3, uses EMOP fits from <a class="reference external" href="https://arxiv.org/abs/1710.02156">https://arxiv.org/abs/1710.02156</a>. Default: 1.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fishergw.ringdown.utils.spherical_harmonics">
+<span class="sig-prename descclassname"><span class="pre">fishergw.ringdown.utils.</span></span><span class="sig-name descname"><span class="pre">spherical_harmonics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">angle</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fishergw/ringdown/utils.html#spherical_harmonics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fishergw.ringdown.utils.spherical_harmonics" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-fishergw.ringdown.waveform">
+<span id="fishergw-ringdown-waveform-module"></span><h2>fishergw.ringdown.waveform module<a class="headerlink" href="#module-fishergw.ringdown.waveform" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="fishergw.ringdown.waveform.RingdownLM">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">fishergw.ringdown.waveform.</span></span><span class="sig-name descname"><span class="pre">RingdownLM</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">modes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">freqs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">taus</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iota</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fishergw/ringdown/waveform.html#RingdownLM"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fishergw.ringdown.waveform.RingdownLM" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class to define the ringdown components with the same angular and azimuthal numbers (l,m) and including the fundamental tone (n=0) and possibly overtones (n&gt;0).</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="fishergw.ringdown.waveform.RingdownLM.Nabla">
+<span class="sig-name descname"><span class="pre">Nabla</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/fishergw/ringdown/waveform.html#RingdownLM.Nabla"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fishergw.ringdown.waveform.RingdownLM.Nabla" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the gradient of the plus and cross signal polarizations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>list of lambda functions, shape: <code class="docutils literal notranslate"><span class="pre">len(self.keys)</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fishergw.ringdown.waveform.RingdownLM.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fishergw/ringdown/waveform.html#RingdownLM.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fishergw.ringdown.waveform.RingdownLM.__call__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the plus and cross polarizations at a given frequency f, including multiplicative factors from the plus and cross spherical harmonics.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>f</strong> (<em>float</em>) – frequency</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-class docutils literal notranslate"><span class="pre">numpy.array</span></code>, shape (2,)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fishergw.ringdown.waveform.RingdownLM.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">modes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">freqs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">taus</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iota</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fishergw/ringdown/waveform.html#RingdownLM.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fishergw.ringdown.waveform.RingdownLM.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>modes</strong> (<em>tuple</em>) – a list specifying the corresponding modes, each as a tuple of angular, azimuthal and overtone numbers (l,m,n).</p></li>
+<li><p><strong>freqs</strong> (<em>list</em>) – frequencies of the tones in ascending order starting from n=0.</p></li>
+<li><p><strong>taus</strong> (<em>list</em>) – damping times of the tones in ascending order starting from n=0.</p></li>
+<li><p><strong>amps</strong> – amplitudes of the tones in ascending order starting from n=0.</p></li>
+<li><p><strong>phis</strong> – phases of the tones in ascending order starting from n=0.</p></li>
+<li><p><strong>iota</strong> (float or <code class="docutils literal notranslate"><span class="pre">None</span></code>) – the inclination angle, which determines the values of the plus and cross spherical harmonics. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, spherical harmonics are averaged over the inclination angle. Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fishergw.ringdown.waveform.RingdownLM.diff_">
+<span class="sig-name descname"><span class="pre">diff_</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">argument</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fishergw/ringdown/waveform.html#RingdownLM.diff_"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fishergw.ringdown.waveform.RingdownLM.diff_" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the derivative of the plus and cross signal polarizations w.r.t. argument.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>argument</strong> (<em>str</em>) – argument of the derivative.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>tuple of lambda functions, shape (2,)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fishergw.ringdown.waveform.RingdownLM.hc">
+<span class="sig-name descname"><span class="pre">hc</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/fishergw/ringdown/waveform.html#RingdownLM.hc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fishergw.ringdown.waveform.RingdownLM.hc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the fourier transform of the cross polarization of the signal.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fishergw.ringdown.waveform.RingdownLM.hp">
+<span class="sig-name descname"><span class="pre">hp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/fishergw/ringdown/waveform.html#RingdownLM.hp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fishergw.ringdown.waveform.RingdownLM.hp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the fourier transform of the plus polarization of the signal.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="fishergw.ringdown.waveform.RingdownMultimode">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">fishergw.ringdown.waveform.</span></span><span class="sig-name descname"><span class="pre">RingdownMultimode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">modes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">freqs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">taus</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iota</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fishergw/ringdown/waveform.html#RingdownMultimode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fishergw.ringdown.waveform.RingdownMultimode" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class to define a multimode ringdown signal as a superimposition of damped sinusoids.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="fishergw.ringdown.waveform.RingdownMultimode.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fishergw/ringdown/waveform.html#RingdownMultimode.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fishergw.ringdown.waveform.RingdownMultimode.__call__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call self as a function.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="fishergw.ringdown.waveform.RingdownMultimode.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">modes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">freqs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">taus</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">amps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iota</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fishergw/ringdown/waveform.html#RingdownMultimode.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fishergw.ringdown.waveform.RingdownMultimode.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>freqs</strong> (<em>list</em>) – frequencies of each mode.</p></li>
+<li><p><strong>taus</strong> (<em>list</em>) – damping times of each mode.</p></li>
+<li><p><strong>amps</strong> – amplitudes of each mode.</p></li>
+<li><p><strong>phis</strong> – phases of each mode.</p></li>
+<li><p><strong>iota</strong> (<em>float</em><em> or </em><em>None</em>) – inclination angle. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, polarizations are averaged over the inclination angle. Default: <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+<li><p><strong>modes</strong> (<em>list</em>) – a list specifying the corresponding modes, each as a set of angular, azimuthal and overtone numbers (l,m,n).</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="fishergw.taylorf2.html" class="btn btn-neutral float-right" title="fishergw.taylorf2 package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="fishergw.cosmology.html" class="btn btn-neutral float-left" title="fishergw.cosmology package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2022, Costantino Pacilio.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

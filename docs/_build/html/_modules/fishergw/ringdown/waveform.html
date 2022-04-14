@@ -1,0 +1,346 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>fishergw.ringdown.waveform &#8212; fishergw 0.0.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css" />
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for fishergw.ringdown.waveform</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">sympy</span> <span class="k">as</span> <span class="nn">sp</span>
+<span class="kn">from</span> <span class="nn">sympy</span> <span class="kn">import</span> <span class="n">Rational</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">scipy.interpolate</span> <span class="kn">import</span> <span class="n">interp1d</span>
+<span class="kn">from</span> <span class="nn">scipy.integrate</span> <span class="kn">import</span> <span class="n">simps</span>
+<span class="kn">from</span> <span class="nn">..cosmology</span> <span class="kn">import</span> <span class="n">redshift_from_distance</span>
+<span class="kn">from</span> <span class="nn">..constants</span> <span class="kn">import</span> <span class="n">speed_of_light</span><span class="p">,</span> <span class="n">solar_mass</span><span class="p">,</span> <span class="n">G</span><span class="p">,</span> <span class="n">Mpc</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="n">spherical_harmonics</span>
+
+<div class="viewcode-block" id="RingdownLM"><a class="viewcode-back" href="../../../fishergw.ringdown.html#fishergw.ringdown.waveform.RingdownLM">[docs]</a><span class="k">class</span> <span class="nc">RingdownLM</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class to define the ringdown components with the same angular and azimuthal numbers (l,m) and including the fundamental tone (n=0) and possibly overtones (n&gt;0). </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="RingdownLM.__init__"><a class="viewcode-back" href="../../../fishergw.ringdown.html#fishergw.ringdown.waveform.RingdownLM.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">modes</span><span class="p">,</span><span class="n">freqs</span><span class="p">,</span><span class="n">taus</span><span class="p">,</span><span class="n">amps</span><span class="p">,</span><span class="n">phis</span><span class="p">,</span><span class="n">iota</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param modes: a list specifying the corresponding modes, each as a tuple of angular, azimuthal and overtone numbers (l,m,n).</span>
+<span class="sd">        :type modes: tuple</span>
+
+<span class="sd">        :param freqs: frequencies of the tones in ascending order starting from n=0.</span>
+<span class="sd">        :type freqs: list</span>
+
+<span class="sd">        :param taus: damping times of the tones in ascending order starting from n=0.</span>
+<span class="sd">        :type taus: list</span>
+
+<span class="sd">        :param amps: amplitudes of the tones in ascending order starting from n=0.</span>
+<span class="sd">        :type taus: list</span>
+
+<span class="sd">        :param phis: phases of the tones in ascending order starting from n=0.</span>
+<span class="sd">        :type taus: list</span>
+
+<span class="sd">        :param iota: the inclination angle, which determines the values of the plus and cross spherical harmonics. If ``None``, spherical harmonics are averaged over the inclination angle. Default: ``None``.</span>
+<span class="sd">        :type iota: float or ``None``</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">modes</span> <span class="o">=</span> <span class="n">modes</span>
+        <span class="n">lm</span> <span class="o">=</span> <span class="n">modes</span><span class="p">[</span><span class="mi">0</span><span class="p">][:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lm</span> <span class="o">=</span> <span class="n">lm</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dim</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">freqs</span><span class="p">)</span>
+        <span class="c1"># compute averages of Yp and Yc over inclination angle</span>
+        <span class="k">if</span> <span class="n">iota</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Yp</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Yc</span> <span class="o">=</span> <span class="n">spherical_harmonics</span><span class="p">(</span><span class="n">iota</span><span class="p">,</span><span class="n">lm</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span><span class="mi">1000</span><span class="p">)</span>
+            <span class="n">Yp</span><span class="p">,</span> <span class="n">Yc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">spherical_harmonics</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">lm</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">X</span><span class="p">])</span><span class="o">.</span><span class="n">T</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Yp</span> <span class="o">=</span> <span class="p">(</span><span class="n">simps</span><span class="p">(</span><span class="n">Yp</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">X</span><span class="p">),</span><span class="n">X</span><span class="p">)</span><span class="o">*</span><span class="mf">0.5</span><span class="p">)</span><span class="o">**</span><span class="mf">0.5</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">Yc</span> <span class="o">=</span> <span class="p">(</span><span class="n">simps</span><span class="p">(</span><span class="n">Yc</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">X</span><span class="p">),</span><span class="n">X</span><span class="p">)</span><span class="o">*</span><span class="mf">0.5</span><span class="p">)</span><span class="o">**</span><span class="mf">0.5</span>
+        <span class="c1"># parameters of the component</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">keys</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">keys</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;f</span><span class="si">%s</span><span class="s1">&#39;</span><span class="o">%</span><span class="n">i</span><span class="p">,</span><span class="s1">&#39;tau</span><span class="si">%s</span><span class="s1">&#39;</span><span class="o">%</span><span class="n">i</span><span class="p">,</span><span class="s1">&#39;logA</span><span class="si">%s</span><span class="s1">&#39;</span><span class="o">%</span><span class="n">i</span><span class="p">,</span><span class="s1">&#39;phi</span><span class="si">%s</span><span class="s1">&#39;</span><span class="o">%</span><span class="n">i</span><span class="p">]</span>
+        <span class="c1"># store parameter values</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;f</span><span class="si">%s</span><span class="s1">&#39;</span><span class="o">%</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">freqs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;tau</span><span class="si">%s</span><span class="s1">&#39;</span><span class="o">%</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">taus</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;logA</span><span class="si">%s</span><span class="s1">&#39;</span><span class="o">%</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">amps</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="s1">&#39;phi</span><span class="si">%s</span><span class="s1">&#39;</span><span class="o">%</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">phis</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="c1"># when eval=True, avoid repeating costing evaluations</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">eval</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;RingdownLM(lm=</span><span class="si">%s</span><span class="s1">)</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">%</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lm</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">):</span>
+            <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;mode</span><span class="si">%d</span><span class="s1">:</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">%</span><span class="n">i</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">modes</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="o">*</span><span class="n">i</span><span class="p">,</span><span class="mi">4</span><span class="o">*</span><span class="n">i</span><span class="o">+</span><span class="mi">4</span><span class="p">):</span>
+                <span class="n">k</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+                <span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+                <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="si">%s</span><span class="s1">:</span><span class="se">\t</span><span class="s1">&#39;</span><span class="o">%</span><span class="n">k</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="k">return</span> <span class="n">out</span>
+
+<div class="viewcode-block" id="RingdownLM.__call__"><a class="viewcode-back" href="../../../fishergw.ringdown.html#fishergw.ringdown.waveform.RingdownLM.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">f</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the plus and cross polarizations at a given frequency f, including multiplicative factors from the plus and cross spherical harmonics.</span>
+<span class="sd">        </span>
+<span class="sd">        :param f: frequency</span>
+<span class="sd">        :type f: float</span>
+
+<span class="sd">        :rtype: :class:`numpy.array`, shape (2,)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval</span><span class="p">:</span>
+            <span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">}</span>
+            <span class="c1">## hp</span>
+            <span class="n">hp_eval</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hp</span><span class="p">()</span><span class="o">.</span><span class="n">subs</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hp_eval</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">lambdify</span><span class="p">(</span><span class="s1">&#39;f&#39;</span><span class="p">,</span><span class="n">hp_eval</span><span class="p">,</span><span class="n">modules</span><span class="o">=</span><span class="s1">&#39;numpy&#39;</span><span class="p">)</span>
+            <span class="c1">## hp</span>
+            <span class="n">hc_eval</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hc</span><span class="p">()</span><span class="o">.</span><span class="n">subs</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hc_eval</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">lambdify</span><span class="p">(</span><span class="s1">&#39;f&#39;</span><span class="p">,</span><span class="n">hc_eval</span><span class="p">,</span><span class="n">modules</span><span class="o">=</span><span class="s1">&#39;numpy&#39;</span><span class="p">)</span>
+            <span class="c1">## update eval</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">eval</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">hp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hp_eval</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">Yp</span>
+        <span class="n">hc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hc_eval</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">Yc</span>
+        <span class="k">return</span> <span class="n">hp</span><span class="p">,</span><span class="n">hc</span></div>
+
+<div class="viewcode-block" id="RingdownLM.Nabla"><a class="viewcode-back" href="../../../fishergw.ringdown.html#fishergw.ringdown.waveform.RingdownLM.Nabla">[docs]</a>    <span class="k">def</span> <span class="nf">Nabla</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the gradient of the plus and cross signal polarizations.</span>
+
+<span class="sd">        :rtype: list of lambda functions, shape: ``len(self.keys)``</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">argument</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">diff_</span><span class="p">(</span><span class="n">argument</span><span class="p">)</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="RingdownLM.diff_"><a class="viewcode-back" href="../../../fishergw.ringdown.html#fishergw.ringdown.waveform.RingdownLM.diff_">[docs]</a>    <span class="k">def</span> <span class="nf">diff_</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">argument</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the derivative of the plus and cross signal polarizations w.r.t. argument.</span>
+
+<span class="sd">        :param argument: argument of the derivative.</span>
+<span class="sd">        :type argument: str</span>
+
+<span class="sd">        :rtype: tuple of lambda functions, shape (2,)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">keys</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">)</span>
+        <span class="n">keys</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">argument</span><span class="p">)</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">}</span>
+        <span class="c1">## hp</span>
+        <span class="n">hp_diff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hp</span><span class="p">()</span><span class="o">.</span><span class="n">subs</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+        <span class="n">hp_diff</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">hp_diff</span><span class="p">,</span><span class="n">argument</span><span class="p">)</span>
+        <span class="n">hp_diff</span> <span class="o">=</span> <span class="n">hp_diff</span><span class="o">.</span><span class="n">subs</span><span class="p">({</span><span class="n">argument</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">argument</span><span class="p">]})</span>
+        <span class="n">hp_diff</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">lambdify</span><span class="p">(</span><span class="s1">&#39;f&#39;</span><span class="p">,</span><span class="n">hp_diff</span><span class="p">,</span><span class="n">modules</span><span class="o">=</span><span class="s1">&#39;scipy&#39;</span><span class="p">)</span>
+        <span class="c1">## hc</span>
+        <span class="n">hc_diff</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hc</span><span class="p">()</span><span class="o">.</span><span class="n">subs</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+        <span class="n">hc_diff</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">hc_diff</span><span class="p">,</span><span class="n">argument</span><span class="p">)</span>
+        <span class="n">hc_diff</span> <span class="o">=</span> <span class="n">hc_diff</span><span class="o">.</span><span class="n">subs</span><span class="p">({</span><span class="n">argument</span><span class="p">:</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">argument</span><span class="p">]})</span>
+        <span class="n">hc_diff</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">lambdify</span><span class="p">(</span><span class="s1">&#39;f&#39;</span><span class="p">,</span><span class="n">hc_diff</span><span class="p">,</span><span class="n">modules</span><span class="o">=</span><span class="s1">&#39;scipy&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="k">lambda</span> <span class="n">f</span><span class="p">:</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Yp</span><span class="o">*</span><span class="n">hp_diff</span><span class="p">(</span><span class="n">f</span><span class="p">),</span><span class="bp">self</span><span class="o">.</span><span class="n">Yc</span><span class="o">*</span><span class="n">hc_diff</span><span class="p">(</span><span class="n">f</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="RingdownLM.hp"><a class="viewcode-back" href="../../../fishergw.ringdown.html#fishergw.ringdown.waveform.RingdownLM.hp">[docs]</a>    <span class="k">def</span> <span class="nf">hp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the fourier transform of the plus polarization of the signal.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># fundamental tone</span>
+        <span class="n">sv</span> <span class="o">=</span> <span class="s1">&#39;f&#39;</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">[:</span><span class="mi">4</span><span class="p">]:</span>
+            <span class="n">sv</span> <span class="o">+=</span> <span class="s1">&#39;,&#39;</span><span class="o">+</span><span class="n">k</span>
+        <span class="n">f</span><span class="p">,</span> <span class="n">f0</span><span class="p">,</span> <span class="n">tau0</span><span class="p">,</span> <span class="n">logA0</span><span class="p">,</span> <span class="n">phi0</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">symbols</span><span class="p">(</span><span class="n">sv</span><span class="p">)</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="p">(</span><span class="mi">10</span><span class="o">**</span><span class="n">logA0</span><span class="p">)</span><span class="o">*</span><span class="n">sp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">sp</span><span class="o">.</span><span class="n">I</span><span class="o">*</span><span class="n">phi0</span><span class="p">)</span><span class="o">*</span><span class="n">tau0</span><span class="o">*</span><span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">sp</span><span class="o">.</span><span class="n">I</span><span class="o">*</span><span class="n">phi0</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="mi">4</span><span class="o">*</span><span class="p">(</span><span class="n">f</span><span class="o">+</span><span class="n">f0</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">tau0</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">+</span>\
+                                   <span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="mi">4</span><span class="o">*</span><span class="p">(</span><span class="n">f</span><span class="o">-</span><span class="n">f0</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">tau0</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+        <span class="c1"># overntones</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">):</span>
+                <span class="n">sv</span> <span class="o">=</span> <span class="s1">&#39;f&#39;</span>
+                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">[</span><span class="n">i</span><span class="o">*</span><span class="mi">4</span><span class="p">:(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="mi">4</span><span class="p">]:</span>
+                    <span class="n">sv</span> <span class="o">+=</span> <span class="s1">&#39;,&#39;</span><span class="o">+</span><span class="n">k</span>
+                <span class="n">f</span><span class="p">,</span> <span class="n">f0</span><span class="p">,</span> <span class="n">tau0</span><span class="p">,</span> <span class="n">logA0</span><span class="p">,</span> <span class="n">phi0</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">symbols</span><span class="p">(</span><span class="n">sv</span><span class="p">)</span>
+                <span class="n">h</span> <span class="o">+=</span> <span class="p">(</span><span class="mi">10</span><span class="o">**</span><span class="n">logA0</span><span class="p">)</span><span class="o">*</span><span class="n">sp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">sp</span><span class="o">.</span><span class="n">I</span><span class="o">*</span><span class="n">phi0</span><span class="p">)</span><span class="o">*</span><span class="n">tau0</span><span class="o">*</span><span class="p">(</span><span class="n">sp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">sp</span><span class="o">.</span><span class="n">I</span><span class="o">*</span><span class="n">phi0</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="mi">4</span><span class="o">*</span><span class="p">(</span><span class="n">f</span><span class="o">+</span>\
+                        <span class="n">f0</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">tau0</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="mi">4</span><span class="o">*</span><span class="p">(</span><span class="n">f</span><span class="o">-</span><span class="n">f0</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">tau0</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">h</span></div>
+
+
+<div class="viewcode-block" id="RingdownLM.hc"><a class="viewcode-back" href="../../../fishergw.ringdown.html#fishergw.ringdown.waveform.RingdownLM.hc">[docs]</a>    <span class="k">def</span> <span class="nf">hc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the fourier transform of the cross polarization of the signal.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># fundamental tone</span>
+        <span class="n">sv</span> <span class="o">=</span> <span class="s1">&#39;f&#39;</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">[:</span><span class="mi">4</span><span class="p">]:</span>
+            <span class="n">sv</span> <span class="o">+=</span> <span class="s1">&#39;,&#39;</span><span class="o">+</span><span class="n">k</span>
+        <span class="n">f</span><span class="p">,</span> <span class="n">f0</span><span class="p">,</span> <span class="n">tau0</span><span class="p">,</span> <span class="n">logA0</span><span class="p">,</span> <span class="n">phi0</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">symbols</span><span class="p">(</span><span class="n">sv</span><span class="p">)</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">I</span><span class="o">*</span><span class="p">(</span><span class="mi">10</span><span class="o">**</span><span class="n">logA0</span><span class="p">)</span><span class="o">*</span><span class="n">sp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">sp</span><span class="o">.</span><span class="n">I</span><span class="o">*</span><span class="n">phi0</span><span class="p">)</span><span class="o">*</span><span class="n">tau0</span><span class="o">*</span><span class="p">(</span><span class="o">-</span><span class="n">sp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">sp</span><span class="o">.</span><span class="n">I</span><span class="o">*</span><span class="n">phi0</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="mi">4</span><span class="o">*</span><span class="p">(</span><span class="n">f</span><span class="o">+</span>\
+                    <span class="n">f0</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">tau0</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="mi">4</span><span class="o">*</span><span class="p">(</span><span class="n">f</span><span class="o">-</span><span class="n">f0</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">tau0</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+        <span class="c1"># overntones</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">):</span>
+                <span class="n">sv</span> <span class="o">=</span> <span class="s1">&#39;f&#39;</span>
+                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">[</span><span class="n">i</span><span class="o">*</span><span class="mi">4</span><span class="p">:(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="mi">4</span><span class="p">]:</span>
+                    <span class="n">sv</span> <span class="o">+=</span> <span class="s1">&#39;,&#39;</span><span class="o">+</span><span class="n">k</span>
+                <span class="n">f</span><span class="p">,</span> <span class="n">f0</span><span class="p">,</span> <span class="n">tau0</span><span class="p">,</span> <span class="n">logA0</span><span class="p">,</span> <span class="n">phi0</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">symbols</span><span class="p">(</span><span class="n">sv</span><span class="p">)</span>
+                <span class="n">h</span> <span class="o">+=</span> <span class="n">sp</span><span class="o">.</span><span class="n">I</span><span class="o">*</span><span class="p">(</span><span class="mi">10</span><span class="o">**</span><span class="n">logA0</span><span class="p">)</span><span class="o">*</span><span class="n">sp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">sp</span><span class="o">.</span><span class="n">I</span><span class="o">*</span><span class="n">phi0</span><span class="p">)</span><span class="o">*</span><span class="n">tau0</span><span class="o">*</span><span class="p">(</span><span class="o">-</span><span class="n">sp</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">sp</span><span class="o">.</span><span class="n">I</span><span class="o">*</span><span class="n">phi0</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="mi">4</span><span class="o">*</span><span class="p">(</span><span class="n">f</span><span class="o">+</span>\
+                    <span class="n">f0</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">tau0</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="mi">4</span><span class="o">*</span><span class="p">(</span><span class="n">f</span><span class="o">-</span><span class="n">f0</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">tau0</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">h</span></div></div>
+
+<div class="viewcode-block" id="RingdownMultimode"><a class="viewcode-back" href="../../../fishergw.ringdown.html#fishergw.ringdown.waveform.RingdownMultimode">[docs]</a><span class="k">class</span> <span class="nc">RingdownMultimode</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class to define a multimode ringdown signal as a superimposition of damped sinusoids.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="RingdownMultimode.__init__"><a class="viewcode-back" href="../../../fishergw.ringdown.html#fishergw.ringdown.waveform.RingdownMultimode.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">modes</span><span class="p">,</span><span class="n">freqs</span><span class="p">,</span><span class="n">taus</span><span class="p">,</span><span class="n">amps</span><span class="p">,</span><span class="n">phis</span><span class="p">,</span><span class="n">iota</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param freqs: frequencies of each mode.</span>
+<span class="sd">        :type freqs: list</span>
+
+<span class="sd">        :param taus: damping times of each mode.</span>
+<span class="sd">        :type taus: list</span>
+
+<span class="sd">        :param amps: amplitudes of each mode.</span>
+<span class="sd">        :type taus: list</span>
+
+<span class="sd">        :param phis: phases of each mode.</span>
+<span class="sd">        :type taus: list</span>
+
+<span class="sd">        :param iota: inclination angle. If ``None``, polarizations are averaged over the inclination angle. Default: ``None``.</span>
+<span class="sd">        :type iota: float or None</span>
+
+<span class="sd">        :param modes: a list specifying the corresponding modes, each as a set of angular, azimuthal and overtone numbers (l,m,n).</span>
+<span class="sd">        :type modes: list</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">components</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="c1">## sort modes by (l,m)</span>
+        <span class="n">sorted_modes</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">modes</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">tup</span><span class="p">:</span> <span class="p">(</span><span class="n">tup</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">tup</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">tup</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+        <span class="n">mode</span> <span class="o">=</span> <span class="n">sorted_modes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="p">[[</span><span class="n">mode</span><span class="p">]]</span>
+        <span class="n">l</span><span class="p">,</span><span class="n">m</span> <span class="o">=</span> <span class="n">mode</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">mode</span> <span class="ow">in</span> <span class="n">sorted_modes</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+            <span class="k">if</span> <span class="n">mode</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="n">l</span> <span class="ow">and</span> <span class="n">mode</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">==</span><span class="n">m</span><span class="p">:</span>
+                <span class="n">tmp</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mode</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">tmp</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">mode</span><span class="p">])</span>
+                <span class="n">l</span><span class="p">,</span><span class="n">m</span> <span class="o">=</span> <span class="n">mode</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">sorted_modes</span> <span class="o">=</span> <span class="n">tmp</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sorted_modes</span> <span class="o">=</span> <span class="n">sorted_modes</span>
+        <span class="c1">## fill components</span>
+        <span class="k">for</span> <span class="n">lm</span> <span class="ow">in</span> <span class="n">sorted_modes</span><span class="p">:</span>
+            <span class="n">loc_modes</span> <span class="o">=</span> <span class="n">lm</span>
+            <span class="n">indices</span> <span class="o">=</span> <span class="p">[</span><span class="n">modes</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">lmn</span><span class="p">)</span> <span class="k">for</span> <span class="n">lmn</span> <span class="ow">in</span> <span class="n">loc_modes</span><span class="p">]</span>
+            <span class="n">loc_freqs</span> <span class="o">=</span> <span class="p">[</span><span class="n">freqs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">]</span>
+            <span class="n">loc_taus</span> <span class="o">=</span> <span class="p">[</span><span class="n">taus</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">]</span>
+            <span class="n">loc_amps</span> <span class="o">=</span> <span class="p">[</span><span class="n">amps</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">]</span>
+            <span class="n">loc_phis</span> <span class="o">=</span> <span class="p">[</span><span class="n">phis</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">]</span>
+            <span class="n">loc_mode</span> <span class="o">=</span> <span class="n">lm</span><span class="p">[</span><span class="mi">0</span><span class="p">][:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">[</span><span class="n">loc_mode</span><span class="p">]</span> <span class="o">=</span> <span class="n">RingdownLM</span><span class="p">(</span><span class="n">lm</span><span class="p">,</span><span class="n">loc_freqs</span><span class="p">,</span><span class="n">loc_taus</span><span class="p">,</span><span class="n">loc_amps</span><span class="p">,</span><span class="n">loc_phis</span><span class="p">,</span><span class="n">iota</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">dim</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;RingdownMultimode</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;sorted modes:</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="k">for</span> <span class="n">lm</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sorted_modes</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">lmn</span> <span class="ow">in</span> <span class="n">lm</span><span class="p">:</span>
+                <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">lmn</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span>
+            <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="k">return</span> <span class="n">out</span>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">lm</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="p">[</span><span class="n">lm</span><span class="p">]</span>
+
+<div class="viewcode-block" id="RingdownMultimode.__call__"><a class="viewcode-back" href="../../../fishergw.ringdown.html#fishergw.ringdown.waveform.RingdownMultimode.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">f</span><span class="p">):</span>
+        <span class="n">hp</span><span class="p">,</span> <span class="n">hc</span> <span class="o">=</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span>
+        <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">components</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">loc_hp</span><span class="p">,</span> <span class="n">loc_hc</span> <span class="o">=</span> <span class="n">comp</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="n">hp</span> <span class="o">+=</span> <span class="n">loc_hp</span>
+            <span class="n">hc</span> <span class="o">+=</span> <span class="n">loc_hc</span>
+        <span class="k">return</span> <span class="n">hp</span><span class="p">,</span> <span class="n">hc</span></div></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">fishergw</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">fishergw</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, Costantino Pacilio.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.1.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -3,8 +3,11 @@
 fishergw_test.ipynb
 Untitled.ipynb
 /fishergw/taylorf2/waveform_andrea.py
-/fishergw/taylorf2/waveform_old.py
-/fishergw/taylorf2/waveform_bs.py
+/fishergw/taylorf2/waveform_*.py
+/fishergw/detector/S_h_scird*
+/notebooks/
+/output/
+/scripts/
 
 .readthedocs.yaml
 

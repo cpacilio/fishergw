@@ -1,0 +1,357 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>fishergw.ringdown.modified_gr &#8212; fishergw 0.0.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css" />
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for fishergw.ringdown.modified_gr</h1><div class="highlight"><pre>
+<span></span><span class="c1">## contains functions to fit Kerr qnms, amplitudes and phases</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">..constants</span> <span class="kn">import</span> <span class="n">speed_of_light</span><span class="p">,</span> <span class="n">solar_mass</span><span class="p">,</span> <span class="n">G</span><span class="p">,</span> <span class="n">Mpc</span>
+
+<span class="n">cc</span> <span class="o">=</span> <span class="n">speed_of_light</span>
+<span class="n">msun</span> <span class="o">=</span> <span class="n">solar_mass</span>
+<span class="c1">## solar mass in secs</span>
+<span class="n">tsun</span> <span class="o">=</span> <span class="n">msun</span><span class="o">*</span><span class="n">G</span><span class="o">/</span><span class="n">cc</span><span class="o">**</span><span class="mi">3</span> <span class="c1">## secs</span>
+
+
+<div class="viewcode-block" id="qnm_KerrNewman"><a class="viewcode-back" href="../../../fishergw.ringdown.html#fishergw.ringdown.modified_gr.qnm_KerrNewman">[docs]</a><span class="k">def</span> <span class="nf">qnm_KerrNewman</span><span class="p">(</span><span class="n">mass</span><span class="p">,</span><span class="n">spin</span><span class="p">,</span><span class="n">charge</span><span class="p">,</span><span class="n">mode</span><span class="p">,</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;fit2&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the frequency and the damping time of a Kerr-Newman black hole</span>
+<span class="sd">    for a given mass, spin, charge-to-mass ratio and mode.</span>
+
+<span class="sd">    :param mass: Mass of the black hole [:math:`M_\odot`].</span>
+<span class="sd">    :param type: float</span>
+
+<span class="sd">    :param spin: Dimensionless spin.</span>
+<span class="sd">    :param type: float</span>
+
+<span class="sd">    :param charge: dimensionless charge-to-mass ratio.</span>
+<span class="sd">    :param type: float</span>
+
+<span class="sd">    :param mode: Angular, azimuthal and overtone number in the form (l,m,n).</span>
+<span class="sd">    :param type: tuple</span>
+
+<span class="sd">:param method: The method used to approximate the Kerr-Newman spectrum. If `fit1`, it uses the fits provided in https://arxiv.org/abs/1307.7315. If `fit2`, it uses the fits provided in the appendix of https://arxiv.org/abs/2109.13961. Deafult: `fit2`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">l</span><span class="p">,</span><span class="n">m</span><span class="p">,</span><span class="n">n</span> <span class="o">=</span> <span class="n">mode</span>
+
+    <span class="n">amax</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">charge</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="mf">0.5</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="mi">1</span><span class="o">-</span><span class="n">amax</span>
+
+    <span class="n">methods</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;fit1&#39;</span><span class="p">,</span><span class="s1">&#39;fit2&#39;</span><span class="p">,</span><span class="s1">&#39;interp&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">methods</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;method should be one of &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">methods</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">method</span><span class="o">==</span><span class="s1">&#39;fit1&#39;</span><span class="p">:</span>
+        <span class="c1">## use fits as provided in https://arxiv.org/abs/1307.7315</span>
+        <span class="c1"># add non-rotating contribution</span>
+        <span class="n">coeffs_R</span> <span class="o">=</span> <span class="p">{(</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">):(</span><span class="mf">0.3737</span><span class="p">,</span><span class="mf">0.0525</span><span class="p">,</span><span class="mf">0.0607</span><span class="p">,</span><span class="o">-</span><span class="mf">0.0463</span><span class="p">,</span><span class="o">-</span><span class="mf">0.0070</span><span class="p">),</span>\
+                  <span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">):(</span><span class="mf">0.3467</span><span class="p">,</span><span class="mf">0.0546</span><span class="p">,</span><span class="mf">0.0709</span><span class="p">,</span><span class="o">-</span><span class="mf">0.0292</span><span class="p">,</span><span class="o">-</span><span class="mf">0.0433</span><span class="p">),</span>\
+                  <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="p">):(</span><span class="mf">0.5994</span><span class="p">,</span><span class="mf">0.0790</span><span class="p">,</span><span class="mf">0.1734</span><span class="p">,</span><span class="o">-</span><span class="mf">0.2019</span><span class="p">,</span><span class="mf">0.0700</span><span class="p">),</span>\
+                  <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">):(</span><span class="mf">0.5826</span><span class="p">,</span><span class="mf">0.0819</span><span class="p">,</span><span class="mf">0.1752</span><span class="p">,</span><span class="o">-</span><span class="mf">0.1753</span><span class="p">,</span><span class="mf">0.0304</span><span class="p">)}</span>
+
+        <span class="n">coeffs_I</span> <span class="o">=</span> <span class="p">{(</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">):(</span><span class="o">-</span><span class="mf">0.0890</span><span class="p">,</span><span class="o">-</span><span class="mf">0.0055</span><span class="p">,</span><span class="mf">0.0024</span><span class="p">,</span><span class="mf">0.0214</span><span class="p">,</span><span class="o">-</span><span class="mf">0.0084</span><span class="p">),</span>\
+                  <span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">):(</span><span class="o">-</span><span class="mf">0.2739</span><span class="p">,</span><span class="o">-</span><span class="mf">0.0157</span><span class="p">,</span><span class="mf">0.0099</span><span class="p">,</span><span class="mf">0.0668</span><span class="p">,</span><span class="o">-</span><span class="mf">0.0239</span><span class="p">),</span>\
+                  <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="p">):(</span><span class="o">-</span><span class="mf">0.0927</span><span class="p">,</span><span class="o">-</span><span class="mf">0.0043</span><span class="p">,</span><span class="o">-</span><span class="mf">0.0013</span><span class="p">,</span><span class="mf">0.0292</span><span class="p">,</span><span class="o">-</span><span class="mf">0.0130</span><span class="p">),</span>\
+                  <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">):(</span><span class="o">-</span><span class="mf">0.2813</span><span class="p">,</span><span class="o">-</span><span class="mf">0.0123</span><span class="p">,</span><span class="o">-</span><span class="mf">0.0050</span><span class="p">,</span><span class="mf">0.0972</span><span class="p">,</span><span class="o">-</span><span class="mf">0.0472</span><span class="p">)}</span>
+
+        <span class="n">f0</span><span class="p">,</span> <span class="n">f1</span><span class="p">,</span> <span class="n">f2</span><span class="p">,</span> <span class="n">f3</span><span class="p">,</span> <span class="n">f4</span> <span class="o">=</span> <span class="n">coeffs_R</span><span class="p">[(</span><span class="n">l</span><span class="p">,</span><span class="n">n</span><span class="p">)]</span>
+        <span class="n">q0</span><span class="p">,</span> <span class="n">q1</span><span class="p">,</span> <span class="n">q2</span><span class="p">,</span> <span class="n">q3</span><span class="p">,</span> <span class="n">q4</span> <span class="o">=</span> <span class="n">coeffs_I</span><span class="p">[(</span><span class="n">l</span><span class="p">,</span><span class="n">n</span><span class="p">)]</span>
+        <span class="n">omegaR</span> <span class="o">=</span> <span class="n">f0</span> <span class="o">+</span> <span class="n">f1</span><span class="o">*</span><span class="n">y</span> <span class="o">+</span> <span class="n">f2</span><span class="o">*</span><span class="n">y</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">f3</span><span class="o">*</span><span class="n">y</span><span class="o">**</span><span class="mi">3</span> <span class="o">+</span> <span class="n">f4</span><span class="o">*</span><span class="n">y</span><span class="o">**</span><span class="mi">4</span>
+        <span class="n">omegaI</span> <span class="o">=</span> <span class="n">q0</span> <span class="o">+</span> <span class="n">q1</span><span class="o">*</span><span class="n">y</span> <span class="o">+</span> <span class="n">q2</span><span class="o">*</span><span class="n">y</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">q3</span><span class="o">*</span><span class="n">y</span><span class="o">**</span><span class="mi">3</span> <span class="o">+</span> <span class="n">q4</span><span class="o">*</span><span class="n">y</span><span class="o">**</span><span class="mi">4</span>
+
+        <span class="c1"># add rotating contribution</span>
+        <span class="n">coeffs_R</span> <span class="o">=</span> <span class="p">{(</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">):(</span><span class="mf">0.0628</span><span class="p">,</span><span class="mf">0.0676</span><span class="p">,</span><span class="mf">0.0209</span><span class="p">,</span><span class="mf">0.0823</span><span class="p">,</span><span class="o">-</span><span class="mf">0.0810</span><span class="p">),</span>\
+                  <span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">):(</span><span class="mf">0.0717</span><span class="p">,</span><span class="mf">0.0764</span><span class="p">,</span><span class="mf">0.0020</span><span class="p">,</span><span class="mf">0.1959</span><span class="p">,</span><span class="o">-</span><span class="mf">0.2213</span><span class="p">),</span>\
+                  <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="p">):(</span><span class="mf">0.0673</span><span class="p">,</span><span class="mf">0.0693</span><span class="p">,</span><span class="mf">0.0211</span><span class="p">,</span><span class="mf">0.0791</span><span class="p">,</span><span class="o">-</span><span class="mf">0.0677</span><span class="p">),</span>\
+                  <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">):(</span><span class="mf">0.0713</span><span class="p">,</span><span class="mf">0.0736</span><span class="p">,</span><span class="mf">0.0108</span><span class="p">,</span><span class="mf">0.1287</span><span class="p">,</span><span class="o">-</span><span class="mf">0.1282</span><span class="p">)}</span>
+
+        <span class="n">coeffs_I</span> <span class="o">=</span> <span class="p">{(</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">):(</span><span class="mf">0.0010</span><span class="p">,</span><span class="mf">0.0014</span><span class="p">,</span><span class="mf">0.0091</span><span class="p">,</span><span class="mf">0.0174</span><span class="p">,</span><span class="mf">0.0145</span><span class="p">),</span>\
+                  <span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">):(</span><span class="mf">0.0065</span><span class="p">,</span><span class="mf">0.0070</span><span class="p">,</span><span class="mf">0.0360</span><span class="p">,</span><span class="mf">0.0254</span><span class="p">,</span><span class="mf">0.0905</span><span class="p">),</span>\
+                  <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="p">):(</span><span class="mf">0.0006</span><span class="p">,</span><span class="mf">0.0014</span><span class="p">,</span><span class="mf">0.0084</span><span class="p">,</span><span class="mf">0.0058</span><span class="p">,</span><span class="mf">0.0122</span><span class="p">),</span>\
+                  <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">):(</span><span class="mf">0.0029</span><span class="p">,</span><span class="mf">0.0059</span><span class="p">,</span><span class="mf">0.0194</span><span class="p">,</span><span class="mf">0.0374</span><span class="p">,</span><span class="mf">0.0231</span><span class="p">)}</span>
+
+        <span class="n">f0</span><span class="p">,</span> <span class="n">f1</span><span class="p">,</span> <span class="n">f2</span><span class="p">,</span> <span class="n">f3</span><span class="p">,</span> <span class="n">f4</span> <span class="o">=</span> <span class="n">coeffs_R</span><span class="p">[(</span><span class="n">l</span><span class="p">,</span><span class="n">n</span><span class="p">)]</span>
+        <span class="n">q0</span><span class="p">,</span> <span class="n">q1</span><span class="p">,</span> <span class="n">q2</span><span class="p">,</span> <span class="n">q3</span><span class="p">,</span> <span class="n">q4</span> <span class="o">=</span> <span class="n">coeffs_I</span><span class="p">[(</span><span class="n">l</span><span class="p">,</span><span class="n">n</span><span class="p">)]</span>
+        <span class="n">omegaR</span> <span class="o">+=</span> <span class="n">spin</span><span class="o">*</span><span class="n">m</span><span class="o">*</span><span class="p">(</span><span class="n">f0</span> <span class="o">+</span> <span class="n">f1</span><span class="o">*</span><span class="n">y</span> <span class="o">+</span> <span class="n">f2</span><span class="o">*</span><span class="n">y</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">f3</span><span class="o">*</span><span class="n">y</span><span class="o">**</span><span class="mi">3</span> <span class="o">+</span> <span class="n">f4</span><span class="o">*</span><span class="n">y</span><span class="o">**</span><span class="mi">4</span><span class="p">)</span>
+        <span class="n">omegaI</span> <span class="o">+=</span> <span class="n">spin</span><span class="o">*</span><span class="n">m</span><span class="o">*</span><span class="p">(</span><span class="n">q0</span> <span class="o">+</span> <span class="n">q1</span><span class="o">*</span><span class="n">y</span> <span class="o">+</span> <span class="n">q2</span><span class="o">*</span><span class="n">y</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">q3</span><span class="o">*</span><span class="n">y</span><span class="o">**</span><span class="mi">3</span> <span class="o">+</span> <span class="n">q4</span><span class="o">*</span><span class="n">y</span><span class="o">**</span><span class="mi">4</span><span class="p">)</span>
+
+        <span class="c1"># f and tau</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">omegaR</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span><span class="o">/</span><span class="n">mass</span><span class="o">/</span><span class="n">tsun</span>
+        <span class="n">tau</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="o">/</span><span class="n">omegaI</span><span class="o">*</span><span class="n">mass</span><span class="o">*</span><span class="n">tsun</span>
+
+    <span class="k">elif</span> <span class="n">method</span><span class="o">==</span><span class="s1">&#39;fit2&#39;</span><span class="p">:</span>
+        <span class="c1">## use fits provided in https://arxiv.org/abs/2109.13961</span>
+        <span class="n">BR</span> <span class="o">=</span> <span class="p">{(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">):</span> <span class="mf">0.37367168</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>\
+                <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mf">0.537583</span><span class="p">,</span><span class="o">-</span><span class="mf">2.990402</span><span class="p">,</span><span class="mf">1.503421</span><span class="p">],</span>\
+                <span class="p">[</span><span class="o">-</span><span class="mf">1.899567</span><span class="p">,</span><span class="o">-</span><span class="mf">2.128633</span><span class="p">,</span><span class="mf">6.626680</span><span class="p">,</span><span class="o">-</span><span class="mf">2.903790</span><span class="p">],</span>\
+                <span class="p">[</span><span class="mf">1.015454</span><span class="p">,</span><span class="mf">2.147094</span><span class="p">,</span><span class="o">-</span><span class="mf">4.672847</span><span class="p">,</span><span class="mf">1.891731</span><span class="p">],</span>\
+                <span class="p">[</span><span class="o">-</span><span class="mf">0.111430</span><span class="p">,</span><span class="o">-</span><span class="mf">0.581706</span><span class="p">,</span><span class="mf">1.021061</span><span class="p">,</span><span class="o">-</span><span class="mf">0.414517</span><span class="p">]]),</span>\
+                <span class="c1">##</span>
+                <span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">):</span> <span class="mf">0.34671099</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>\
+                <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mf">2.918987</span><span class="p">,</span><span class="mf">2.866252</span><span class="p">,</span><span class="o">-</span><span class="mf">0.944554</span><span class="p">],</span>\
+                <span class="p">[</span><span class="o">-</span><span class="mf">1.850299</span><span class="p">,</span><span class="mf">7.321955</span><span class="p">,</span><span class="o">-</span><span class="mf">8.783456</span><span class="p">,</span><span class="mf">3.292966</span><span class="p">],</span>\
+                <span class="p">[</span><span class="mf">0.944088</span><span class="p">,</span><span class="o">-</span><span class="mf">5.584876</span><span class="p">,</span><span class="mf">7.675096</span><span class="p">,</span><span class="o">-</span><span class="mf">3.039132</span><span class="p">],</span>\
+                <span class="p">[</span><span class="o">-</span><span class="mf">0.088458</span><span class="p">,</span><span class="mf">1.198758</span><span class="p">,</span><span class="o">-</span><span class="mf">1.973222</span><span class="p">,</span><span class="mf">0.838109</span><span class="p">]]),</span>\
+                <span class="c1">##</span>
+                <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="p">):</span> <span class="mf">0.59944329</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>\
+                <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mf">0.311963</span><span class="p">,</span><span class="o">-</span><span class="mf">1.457057</span><span class="p">,</span><span class="mf">0.825692</span><span class="p">],</span>\
+                <span class="p">[</span><span class="o">-</span><span class="mf">1.928277</span><span class="p">,</span><span class="o">-</span><span class="mf">0.026433</span><span class="p">,</span><span class="mf">3.139427</span><span class="p">,</span><span class="o">-</span><span class="mf">1.484557</span><span class="p">],</span>\
+                <span class="p">[</span><span class="mf">1.044039</span><span class="p">,</span><span class="mf">0.545708</span><span class="p">,</span><span class="o">-</span><span class="mf">2.188569</span><span class="p">,</span><span class="mf">0.940019</span><span class="p">],</span>\
+                <span class="p">[</span><span class="o">-</span><span class="mf">0.112303</span><span class="p">,</span><span class="o">-</span><span class="mf">0.226402</span><span class="p">,</span><span class="mf">0.482482</span><span class="p">,</span><span class="o">-</span><span class="mf">0.204299</span><span class="p">]])}</span>
+        <span class="c1">##</span>
+        <span class="n">CR</span> <span class="o">=</span> <span class="p">{(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">):</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mf">0.548651</span><span class="p">,</span><span class="o">-</span><span class="mf">3.141145</span><span class="p">,</span><span class="mf">1.636377</span><span class="p">],</span>\
+                <span class="p">[</span><span class="o">-</span><span class="mf">2.238461</span><span class="p">,</span><span class="o">-</span><span class="mf">2.291933</span><span class="p">,</span><span class="mf">7.695570</span><span class="p">,</span><span class="o">-</span><span class="mf">3.458474</span><span class="p">],</span>\
+                <span class="p">[</span><span class="mf">1.581677</span><span class="p">,</span><span class="mf">2.662938</span><span class="p">,</span><span class="o">-</span><span class="mf">6.256090</span><span class="p">,</span><span class="mf">2.494264</span><span class="p">],</span>\
+                <span class="p">[</span><span class="o">-</span><span class="mf">0.341455</span><span class="p">,</span><span class="o">-</span><span class="mf">0.930069</span><span class="p">,</span><span class="mf">1.688288</span><span class="p">,</span><span class="o">-</span><span class="mf">0.612643</span><span class="p">]]),</span>\
+                <span class="c1">##</span>
+                <span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">):</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mf">2.941138</span><span class="p">,</span><span class="mf">2.907859</span><span class="p">,</span><span class="o">-</span><span class="mf">0.964407</span><span class="p">],</span>\
+                <span class="p">[</span><span class="o">-</span><span class="mf">2.250169</span><span class="p">,</span><span class="mf">8.425183</span><span class="p">,</span><span class="o">-</span><span class="mf">9.852886</span><span class="p">,</span><span class="mf">3.660289</span><span class="p">],</span>\
+                <span class="p">[</span><span class="mf">1.611393</span><span class="p">,</span><span class="o">-</span><span class="mf">7.869432</span><span class="p">,</span><span class="mf">9.999751</span><span class="p">,</span><span class="o">-</span><span class="mf">3.737205</span><span class="p">],</span>\
+                <span class="p">[</span><span class="o">-</span><span class="mf">0.359285</span><span class="p">,</span><span class="mf">2.392321</span><span class="p">,</span><span class="o">-</span><span class="mf">3.154979</span><span class="p">,</span><span class="mf">1.129776</span><span class="p">]]),</span>\
+                <span class="c1">##</span>
+                <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="p">):</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mf">0.299153</span><span class="p">,</span><span class="o">-</span><span class="mf">1.591595</span><span class="p">,</span><span class="mf">0.938987</span><span class="p">],</span>\
+                <span class="p">[</span><span class="o">-</span><span class="mf">2.265230</span><span class="p">,</span><span class="mf">0.058508</span><span class="p">,</span><span class="mf">3.772084</span><span class="p">,</span><span class="o">-</span><span class="mf">1.852247</span><span class="p">],</span>\
+                <span class="p">[</span><span class="mf">1.624332</span><span class="p">,</span><span class="mf">0.533096</span><span class="p">,</span><span class="o">-</span><span class="mf">3.007197</span><span class="p">,</span><span class="mf">1.285026</span><span class="p">],</span>\
+                <span class="p">[</span><span class="o">-</span><span class="mf">0.357651</span><span class="p">,</span><span class="o">-</span><span class="mf">0.300599</span><span class="p">,</span><span class="mf">0.810387</span><span class="p">,</span><span class="o">-</span><span class="mf">0.314715</span><span class="p">]])}</span>
+        <span class="c1">##</span>
+        <span class="n">BI</span> <span class="o">=</span> <span class="p">{(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">):</span> <span class="mf">0.08896232</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>\
+                <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mf">2.721789</span><span class="p">,</span><span class="mf">2.472860</span><span class="p">,</span><span class="o">-</span><span class="mf">0.750015</span><span class="p">],</span>\
+                <span class="p">[</span><span class="o">-</span><span class="mf">2.533958</span><span class="p">,</span><span class="mf">7.181110</span><span class="p">,</span><span class="o">-</span><span class="mf">6.870324</span><span class="p">,</span><span class="mf">2.214689</span><span class="p">],</span>\
+                <span class="p">[</span><span class="mf">2.102750</span><span class="p">,</span><span class="o">-</span><span class="mf">6.317887</span><span class="p">,</span><span class="mf">6.206452</span><span class="p">,</span><span class="o">-</span><span class="mf">1.980749</span><span class="p">],</span>\
+                <span class="p">[</span><span class="o">-</span><span class="mf">0.568636</span><span class="p">,</span><span class="mf">1.857404</span><span class="p">,</span><span class="o">-</span><span class="mf">1.820547</span><span class="p">,</span><span class="mf">0.554722</span><span class="p">]]),</span>\
+                <span class="c1">##</span>
+                <span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">):</span> <span class="mf">0.27391488</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>\
+                <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mf">3.074983</span><span class="p">,</span><span class="mf">3.182195</span><span class="p">,</span><span class="o">-</span><span class="mf">1.105297</span><span class="p">],</span>\
+                <span class="p">[</span><span class="mf">0.366066</span><span class="p">,</span><span class="mf">4.296285</span><span class="p">,</span><span class="o">-</span><span class="mf">9.700146</span><span class="p">,</span><span class="mf">5.016955</span><span class="p">],</span>\
+                <span class="p">[</span><span class="o">-</span><span class="mf">3.290350</span><span class="p">,</span><span class="o">-</span><span class="mf">0.844265</span><span class="p">,</span><span class="mf">9.999863</span><span class="p">,</span><span class="o">-</span><span class="mf">5.818349</span><span class="p">],</span>\
+                <span class="p">[</span><span class="mf">1.927196</span><span class="p">,</span><span class="o">-</span><span class="mf">0.401520</span><span class="p">,</span><span class="o">-</span><span class="mf">3.537667</span><span class="p">,</span><span class="mf">2.077991</span><span class="p">]]),</span>\
+                <span class="c1">##</span>
+                <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="p">):</span> <span class="mf">0.09270305</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>\
+                <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mf">2.813977</span><span class="p">,</span><span class="mf">2.666759</span><span class="p">,</span><span class="o">-</span><span class="mf">0.850618</span><span class="p">],</span>\
+                <span class="p">[</span><span class="o">-</span><span class="mf">2.163575</span><span class="p">,</span><span class="mf">6.934304</span><span class="p">,</span><span class="o">-</span><span class="mf">7.425335</span><span class="p">,</span><span class="mf">2.640936</span><span class="p">],</span>\
+                <span class="p">[</span><span class="mf">1.405496</span><span class="p">,</span><span class="o">-</span><span class="mf">5.678573</span><span class="p">,</span><span class="mf">6.621826</span><span class="p">,</span><span class="o">-</span><span class="mf">2.345713</span><span class="p">],</span>
+                <span class="p">[</span><span class="o">-</span><span class="mf">0.241561</span><span class="p">,</span><span class="mf">1.555843</span><span class="p">,</span><span class="o">-</span><span class="mf">1.890365</span><span class="p">,</span><span class="mf">0.637480</span><span class="p">]])}</span>
+        <span class="c1">##</span>
+        <span class="n">CI</span> <span class="o">=</span> <span class="p">{(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">):</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mf">2.732346</span><span class="p">,</span><span class="mf">2.495049</span><span class="p">,</span><span class="o">-</span><span class="mf">0.761581</span><span class="p">],</span>\
+                <span class="p">[</span><span class="o">-</span><span class="mf">2.498341</span><span class="p">,</span><span class="mf">7.089542</span><span class="p">,</span><span class="o">-</span><span class="mf">6.781334</span><span class="p">,</span><span class="mf">2.181880</span><span class="p">],</span>\
+                <span class="p">[</span><span class="mf">2.056918</span><span class="p">,</span><span class="o">-</span><span class="mf">6.149334</span><span class="p">,</span><span class="mf">6.010021</span><span class="p">,</span><span class="o">-</span><span class="mf">1.909275</span><span class="p">],</span>\
+                <span class="p">[</span><span class="o">-</span><span class="mf">0.557557</span><span class="p">,</span><span class="mf">1.786783</span><span class="p">,</span><span class="o">-</span><span class="mf">1.734461</span><span class="p">,</span><span class="mf">0.524997</span><span class="p">]]),</span>\
+                <span class="c1">##</span>
+                <span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">):</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mf">3.079686</span><span class="p">,</span><span class="mf">3.191889</span><span class="p">,</span><span class="o">-</span><span class="mf">1.110140</span><span class="p">],</span>\
+                <span class="p">[</span><span class="mf">0.388928</span><span class="p">,</span><span class="mf">4.159242</span><span class="p">,</span><span class="o">-</span><span class="mf">9.474149</span><span class="p">,</span><span class="mf">4.904881</span><span class="p">],</span>\
+                <span class="p">[</span><span class="o">-</span><span class="mf">3.119527</span><span class="p">,</span><span class="o">-</span><span class="mf">0.914668</span><span class="p">,</span><span class="mf">9.767356</span><span class="p">,</span><span class="o">-</span><span class="mf">5.690517</span><span class="p">],</span>\
+                <span class="p">[</span><span class="mf">1.746957</span><span class="p">,</span><span class="o">-</span><span class="mf">0.240680</span><span class="p">,</span><span class="o">-</span><span class="mf">3.505359</span><span class="p">,</span><span class="mf">2.049254</span><span class="p">]]),</span>\
+                <span class="c1">##</span>
+                <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="p">):</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mf">2.820763</span><span class="p">,</span><span class="mf">2.680557</span><span class="p">,</span><span class="o">-</span><span class="mf">0.857462</span><span class="p">],</span>\
+                <span class="p">[</span><span class="o">-</span><span class="mf">2.130446</span><span class="p">,</span><span class="mf">6.825101</span><span class="p">,</span><span class="o">-</span><span class="mf">7.291058</span><span class="p">,</span><span class="mf">2.583282</span><span class="p">],</span>\
+                <span class="p">[</span><span class="mf">1.394144</span><span class="p">,</span><span class="o">-</span><span class="mf">5.533669</span><span class="p">,</span><span class="mf">6.393699</span><span class="p">,</span><span class="o">-</span><span class="mf">2.254239</span><span class="p">],</span>\
+                <span class="p">[</span><span class="o">-</span><span class="mf">0.261229</span><span class="p">,</span><span class="mf">1.517744</span><span class="p">,</span><span class="o">-</span><span class="mf">1.810579</span><span class="p">,</span><span class="mf">0.608393</span><span class="p">]])}</span>
+        <span class="c1">##</span>
+        <span class="n">qq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">charge</span><span class="o">**</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">)])</span>
+        <span class="n">ss</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">spin</span><span class="o">**</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">)])</span>
+        <span class="c1">#omegaR = np.sum(np.dot(ss,np.dot(BR[mode],qq)))/np.sum(np.dot(ss,np.dot(CR[mode],qq)))</span>
+        <span class="c1">#omegaI = np.sum(np.dot(ss,np.dot(BI[mode],qq)))/np.sum(np.dot(ss,np.dot(CI[mode],qq)))</span>
+        <span class="n">omegaR</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">ss</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">BR</span><span class="p">[</span><span class="n">mode</span><span class="p">],</span><span class="n">qq</span><span class="p">))</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">ss</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">CR</span><span class="p">[</span><span class="n">mode</span><span class="p">],</span><span class="n">qq</span><span class="p">))</span>
+        <span class="n">omegaI</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">ss</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">BI</span><span class="p">[</span><span class="n">mode</span><span class="p">],</span><span class="n">qq</span><span class="p">))</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">ss</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">CI</span><span class="p">[</span><span class="n">mode</span><span class="p">],</span><span class="n">qq</span><span class="p">))</span>
+        <span class="c1"># f and tau</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">omegaR</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span><span class="o">/</span><span class="n">mass</span><span class="o">/</span><span class="n">tsun</span>
+        <span class="n">tau</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="n">omegaI</span><span class="o">*</span><span class="n">mass</span><span class="o">*</span><span class="n">tsun</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s1">&#39;Only the fit methods are implemented!&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">f</span><span class="p">,</span> <span class="n">tau</span></div>
+
+<div class="viewcode-block" id="qnm_EdGB"><a class="viewcode-back" href="../../../fishergw.ringdown.html#fishergw.ringdown.modified_gr.qnm_EdGB">[docs]</a><span class="k">def</span> <span class="nf">qnm_EdGB</span><span class="p">(</span><span class="n">mass</span><span class="p">,</span><span class="n">spin</span><span class="p">,</span><span class="n">zeta</span><span class="p">,</span><span class="n">mode</span><span class="p">,</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;fit1&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the frequency and the damping time of a Kerr-Newman black hole</span>
+<span class="sd">    for a given mass, spin, charge-to-mass ratio and mode.</span>
+
+<span class="sd">    :param mass: Mass of the black hole [:math:`M_\odot`].</span>
+<span class="sd">    :param type: float</span>
+
+<span class="sd">    :param spin: Dimensionless spin.</span>
+<span class="sd">    :param type: float</span>
+
+<span class="sd">    :param charge: dimensionless charge-to-mass ratio.</span>
+<span class="sd">    :param type: float</span>
+
+<span class="sd">    :param mode: Angular, azimuthal and overtone number in the form (l,m,n).</span>
+<span class="sd">    :param type: tuple</span>
+
+<span class="sd">:param method: The method used to approximate the Kerr-Newman spectrum. If `fit1`, it uses the fits provided in https://arxiv.org/abs/1307.7315. If `fit2`, it uses the fits provided in the appendix of https://arxiv.org/abs/2109.13961. Deafult: `fit2`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">l</span><span class="p">,</span><span class="n">m</span><span class="p">,</span><span class="n">n</span> <span class="o">=</span> <span class="n">mode</span>
+
+    <span class="n">methods</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;fit1&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">methods</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;method should be one of &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">methods</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">method</span><span class="o">==</span><span class="s1">&#39;fit1&#39;</span><span class="p">:</span>
+        <span class="c1">## use fits as provided by Lorenzo</span>
+        <span class="c1"># add non-rotating contribution</span>
+        <span class="n">coeffs_R</span> <span class="o">=</span> <span class="p">{(</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">):(</span><span class="mf">0.373671</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mf">0.0140594</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00754829</span><span class="p">,</span>\
+                <span class="mf">0.00152926</span><span class="p">,</span><span class="mf">0.00642125</span><span class="p">,</span><span class="o">-</span><span class="mf">0.000992664</span><span class="p">),</span>\
+                  <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="p">):(</span><span class="mf">0.599442</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mf">0.0544579</span><span class="p">,</span><span class="o">-</span><span class="mf">0.0322951</span><span class="p">,</span>\
+                   <span class="mf">0.0733055</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00175477</span><span class="p">,</span><span class="o">-</span><span class="mf">0.0258144</span><span class="p">)}</span>
+
+        <span class="n">coeffs_I</span> <span class="o">=</span> <span class="p">{(</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">):(</span><span class="o">-</span><span class="mf">0.0889625</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00469285</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00627901</span><span class="p">,</span>\
+                <span class="o">-</span><span class="mf">0.00195346</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00541852</span><span class="p">,</span><span class="mf">0.00389027</span><span class="p">),</span>\
+                  <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="p">):(</span><span class="o">-</span><span class="mf">0.0927031</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00715884</span><span class="p">,</span><span class="o">-</span><span class="mf">0.011622</span><span class="p">,</span>\
+                  <span class="mf">0.0145533</span><span class="p">,</span><span class="mf">0.00799485</span><span class="p">,</span><span class="o">-</span><span class="mf">0.0189346</span><span class="p">)}</span>
+
+        <span class="n">fs</span> <span class="o">=</span> <span class="n">coeffs_R</span><span class="p">[(</span><span class="n">l</span><span class="p">,</span><span class="n">n</span><span class="p">)]</span>
+        <span class="n">qs</span> <span class="o">=</span> <span class="n">coeffs_I</span><span class="p">[(</span><span class="n">l</span><span class="p">,</span><span class="n">n</span><span class="p">)]</span>
+        <span class="n">omegaR</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="n">fs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">zeta</span><span class="o">**</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">fs</span><span class="p">))])</span>
+        <span class="n">omegaI</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="n">qs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">zeta</span><span class="o">**</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">qs</span><span class="p">))])</span>
+
+        <span class="c1"># add O(m*spin) contribution</span>
+        <span class="n">coeffs_R</span> <span class="o">=</span> <span class="p">{(</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">):(</span><span class="mf">0.0628978</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mf">0.0104803</span><span class="p">,</span><span class="o">-</span><span class="mf">0.0107957</span><span class="p">,</span>\
+                <span class="o">-</span><span class="mf">0.00112558</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00357684</span><span class="p">,</span><span class="mf">0.0154108</span><span class="p">),</span>\
+                  <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="p">):(</span><span class="mf">0.0673656</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mf">0.0214809</span><span class="p">,</span><span class="o">-</span><span class="mf">0.0220525</span><span class="p">,</span>\
+                   <span class="mf">0.0550205</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00731002</span><span class="p">,</span><span class="o">-</span><span class="mf">0.0344358</span><span class="p">)}</span>
+
+        <span class="n">coeffs_I</span> <span class="o">=</span> <span class="p">{(</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">):(</span><span class="mf">0.00100132</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mf">0.0000142364</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00194089</span><span class="p">,</span>\
+                <span class="o">-</span><span class="mf">0.0151062</span><span class="p">,</span><span class="mf">0.0245121</span><span class="p">,</span><span class="o">-</span><span class="mf">0.054223</span><span class="p">),</span>\
+                  <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="p">):(</span><span class="mf">0.000651781</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.0012462</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00442894</span><span class="p">,</span>\
+                  <span class="mf">0.00881815</span><span class="p">,</span><span class="o">-</span><span class="mf">0.0366831</span><span class="p">,</span><span class="mf">0.0363787</span><span class="p">)}</span>
+
+        <span class="n">fs</span> <span class="o">=</span> <span class="n">coeffs_R</span><span class="p">[(</span><span class="n">l</span><span class="p">,</span><span class="n">n</span><span class="p">)]</span>
+        <span class="n">qs</span> <span class="o">=</span> <span class="n">coeffs_I</span><span class="p">[(</span><span class="n">l</span><span class="p">,</span><span class="n">n</span><span class="p">)]</span>
+        <span class="n">omegaR</span> <span class="o">+=</span> <span class="n">spin</span><span class="o">*</span><span class="n">m</span><span class="o">*</span><span class="nb">sum</span><span class="p">([</span><span class="n">fs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">zeta</span><span class="o">**</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">fs</span><span class="p">))])</span>
+        <span class="n">omegaI</span> <span class="o">+=</span> <span class="n">spin</span><span class="o">*</span><span class="n">m</span><span class="o">*</span><span class="nb">sum</span><span class="p">([</span><span class="n">qs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">zeta</span><span class="o">**</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">qs</span><span class="p">))])</span>
+
+        <span class="c1"># add O(spin^2) contribution</span>
+        <span class="n">coeffs_R</span> <span class="o">=</span> <span class="p">{(</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">):(</span><span class="mf">0.0359141</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.0136826</span><span class="p">,</span><span class="mf">0.0111001</span><span class="p">,</span>\
+                <span class="mf">0.0063752</span><span class="p">,</span><span class="mf">0.0100457</span><span class="p">,</span><span class="o">-</span><span class="mf">0.000194589</span><span class="p">),</span>\
+                  <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="p">):(</span><span class="mf">0.0475846</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.0300244</span><span class="p">,</span><span class="mf">0.00172412</span><span class="p">,</span>\
+                   <span class="mf">0.0823261</span><span class="p">,</span><span class="o">-</span><span class="mf">0.234251</span><span class="p">,</span><span class="mf">0.223573</span><span class="p">)}</span>
+
+        <span class="n">coeffs_I</span> <span class="o">=</span> <span class="p">{(</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">):(</span><span class="mf">0.00638133</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.00810781</span><span class="p">,</span><span class="mf">0.0108534</span><span class="p">,</span>\
+                <span class="o">-</span><span class="mf">0.00172558</span><span class="p">,</span><span class="mf">0.0371894</span><span class="p">,</span><span class="o">-</span><span class="mf">0.0265663</span><span class="p">),</span>\
+                  <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="p">):(</span><span class="mf">0.00659952</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.0106413</span><span class="p">,</span><span class="mf">0.0907605</span><span class="p">,</span>\
+                  <span class="o">-</span><span class="mf">0.451635</span><span class="p">,</span><span class="mf">1.03177</span><span class="p">,</span><span class="o">-</span><span class="mf">0.864954</span><span class="p">)}</span>
+
+        <span class="n">fs</span> <span class="o">=</span> <span class="n">coeffs_R</span><span class="p">[(</span><span class="n">l</span><span class="p">,</span><span class="n">n</span><span class="p">)]</span>
+        <span class="n">qs</span> <span class="o">=</span> <span class="n">coeffs_I</span><span class="p">[(</span><span class="n">l</span><span class="p">,</span><span class="n">n</span><span class="p">)]</span>
+        <span class="n">omegaR</span> <span class="o">+=</span> <span class="n">spin</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="nb">sum</span><span class="p">([</span><span class="n">fs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">zeta</span><span class="o">**</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">fs</span><span class="p">))])</span>
+        <span class="n">omegaI</span> <span class="o">+=</span> <span class="n">spin</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="nb">sum</span><span class="p">([</span><span class="n">qs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">zeta</span><span class="o">**</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">qs</span><span class="p">))])</span>
+
+        <span class="c1"># add O(m^2*spin^2) contribution</span>
+        <span class="n">coeffs_R</span> <span class="o">=</span> <span class="p">{(</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">):(</span><span class="mf">0.00895781</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mf">0.0083094</span><span class="p">,</span><span class="o">-</span><span class="mf">0.0130798</span><span class="p">,</span>\
+                <span class="mf">0.00968677</span><span class="p">,</span><span class="o">-</span><span class="mf">0.0783303</span><span class="p">,</span><span class="mf">0.0996714</span><span class="p">),</span>\
+                  <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="p">):(</span><span class="mf">0.00661201</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mf">0.009497</span><span class="p">,</span><span class="o">-</span><span class="mf">0.00998551</span><span class="p">,</span>\
+                   <span class="mf">0.0197499</span><span class="p">,</span><span class="mf">0.00284495</span><span class="p">,</span><span class="o">-</span><span class="mf">0.0411144</span><span class="p">)}</span>
+
+        <span class="n">coeffs_I</span> <span class="o">=</span> <span class="p">{(</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">):(</span><span class="o">-</span><span class="mf">0.000312294</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.00302198</span><span class="p">,</span><span class="mf">0.00492451</span><span class="p">,</span>\
+                <span class="o">-</span><span class="mf">0.0241024</span><span class="p">,</span><span class="mf">0.0709671</span><span class="p">,</span><span class="o">-</span><span class="mf">0.110537</span><span class="p">),</span>\
+                  <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="p">):(</span><span class="mf">0.0000615071</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="mf">0.000712262</span><span class="p">,</span><span class="mf">0.0208969</span><span class="p">,</span>\
+                  <span class="o">-</span><span class="mf">0.13611</span><span class="p">,</span><span class="mf">0.332366</span><span class="p">,</span><span class="o">-</span> <span class="mf">0.305122</span><span class="p">)}</span>
+
+        <span class="n">fs</span> <span class="o">=</span> <span class="n">coeffs_R</span><span class="p">[(</span><span class="n">l</span><span class="p">,</span><span class="n">n</span><span class="p">)]</span>
+        <span class="n">qs</span> <span class="o">=</span> <span class="n">coeffs_I</span><span class="p">[(</span><span class="n">l</span><span class="p">,</span><span class="n">n</span><span class="p">)]</span>
+        <span class="n">omegaR</span> <span class="o">+=</span> <span class="p">(</span><span class="n">m</span><span class="o">*</span><span class="n">spin</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="nb">sum</span><span class="p">([</span><span class="n">fs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">zeta</span><span class="o">**</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">fs</span><span class="p">))])</span>
+        <span class="n">omegaI</span> <span class="o">+=</span> <span class="p">(</span><span class="n">m</span><span class="o">*</span><span class="n">spin</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="nb">sum</span><span class="p">([</span><span class="n">qs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">zeta</span><span class="o">**</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">qs</span><span class="p">))])</span>
+
+        <span class="c1"># f and tau</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">omegaR</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span><span class="o">/</span><span class="n">mass</span><span class="o">/</span><span class="n">tsun</span>
+        <span class="n">tau</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="o">/</span><span class="n">omegaI</span><span class="o">*</span><span class="n">mass</span><span class="o">*</span><span class="n">tsun</span>
+
+    <span class="k">return</span> <span class="n">f</span><span class="p">,</span> <span class="n">tau</span></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">fishergw</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">fishergw</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, Costantino Pacilio.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.1.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

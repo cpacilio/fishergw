@@ -1,0 +1,636 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>fishergw.ringdown.utils &#8212; fishergw 0.0.2 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/alabaster.css" />
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for fishergw.ringdown.utils</h1><div class="highlight"><pre>
+<span></span><span class="c1">## contains functions to fit Kerr qnms, amplitudes and phases</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy.interpolate</span> <span class="kn">import</span> <span class="n">interp1d</span>
+<span class="kn">from</span> <span class="nn">scipy.optimize</span> <span class="kn">import</span> <span class="n">bisect</span>
+<span class="kn">from</span> <span class="nn">..constants</span> <span class="kn">import</span> <span class="n">speed_of_light</span><span class="p">,</span> <span class="n">solar_mass</span><span class="p">,</span> <span class="n">G</span><span class="p">,</span> <span class="n">Mpc</span>
+<span class="kn">from</span> <span class="nn">.harmonics</span> <span class="kn">import</span> <span class="n">sYlm</span>
+<span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">realpath</span><span class="p">,</span> <span class="n">dirname</span>
+<span class="c1">#import warnings</span>
+
+<span class="n">full_path</span> <span class="o">=</span> <span class="n">realpath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span>
+<span class="n">dir_path</span> <span class="o">=</span> <span class="n">dirname</span><span class="p">(</span><span class="n">full_path</span><span class="p">)</span>
+
+<span class="n">cc</span> <span class="o">=</span> <span class="n">speed_of_light</span>
+<span class="n">msun</span> <span class="o">=</span> <span class="n">solar_mass</span>
+<span class="c1">## solar mass in secs</span>
+<span class="n">tsun</span> <span class="o">=</span> <span class="n">msun</span><span class="o">*</span><span class="n">G</span><span class="o">/</span><span class="n">cc</span><span class="o">**</span><span class="mi">3</span> <span class="c1">## secs</span>
+
+<div class="viewcode-block" id="spherical_harmonics"><a class="viewcode-back" href="../../../fishergw.ringdown.html#fishergw.ringdown.utils.spherical_harmonics">[docs]</a><span class="k">def</span> <span class="nf">spherical_harmonics</span><span class="p">(</span><span class="n">angle</span><span class="p">,</span><span class="n">mode</span><span class="p">):</span>
+    <span class="n">l</span><span class="p">,</span> <span class="n">m</span> <span class="o">=</span> <span class="n">mode</span>
+    <span class="n">Yp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">sYlm</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span><span class="n">l</span><span class="p">,</span><span class="n">m</span><span class="p">,</span><span class="n">angle</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span><span class="o">+</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">**</span><span class="n">l</span><span class="o">*</span><span class="n">sYlm</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span><span class="n">l</span><span class="p">,</span><span class="o">-</span><span class="n">m</span><span class="p">,</span><span class="n">angle</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span>
+    <span class="n">Yc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">sYlm</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span><span class="n">l</span><span class="p">,</span><span class="n">m</span><span class="p">,</span><span class="n">angle</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span><span class="o">-</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">**</span><span class="n">l</span><span class="o">*</span><span class="n">sYlm</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span><span class="n">l</span><span class="p">,</span><span class="o">-</span><span class="n">m</span><span class="p">,</span><span class="n">angle</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">Yp</span><span class="p">,</span> <span class="n">Yc</span></div>
+
+<div class="viewcode-block" id="ringdown_relative_amplitudes"><a class="viewcode-back" href="../../../fishergw.ringdown.html#fishergw.ringdown.utils.ringdown_relative_amplitudes">[docs]</a><span class="k">def</span> <span class="nf">ringdown_relative_amplitudes</span><span class="p">(</span><span class="n">mass_ratio</span><span class="p">,</span><span class="n">spin1</span><span class="p">,</span><span class="n">spin2</span><span class="p">,</span><span class="n">mode</span><span class="p">,</span><span class="n">method</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the ratio of the ringdown amplitudes relative to the amplitude of the (2,2,0) mode.</span>
+<span class="sd">    </span>
+<span class="sd">    :param mass_ratio: the mass ratio of the progenitor binary, defined as m1/m2&gt;1.</span>
+<span class="sd">    :type mass_ratio: float</span>
+
+<span class="sd">    :param spin1: the projection of the dimensionless spin of the first black hole component the z axis.</span>
+<span class="sd">    :type spin1: float</span>
+
+<span class="sd">    :param spin2: the projection of the dimensionless spin of the second component along the z axis.</span>
+<span class="sd">    :type spin2: float</span>
+
+<span class="sd">    :param mode: Angular, azimuthal and overtnone number in the form (l,m,n).</span>
+<span class="sd">    :type mode: tuple</span>
+
+<span class="sd">    :param method: if 1, use fits from https://arxiv.org/abs/1207.0399; if 2, use fits from https://arxiv.org/abs/2005.03260 in an updated form; if 3, uses EMOP fits from https://arxiv.org/abs/1710.02156. Default: 1.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="c1">## use https://arxiv.org/abs/1207.0399</span>
+        <span class="n">eta</span> <span class="o">=</span> <span class="n">mass_ratio</span><span class="o">/</span><span class="p">(</span><span class="n">mass_ratio</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+        <span class="n">chi_p</span> <span class="o">=</span> <span class="p">(</span><span class="n">mass_ratio</span><span class="o">*</span><span class="n">spin1</span><span class="o">+</span><span class="n">spin2</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">mass_ratio</span><span class="p">)</span>
+        <span class="n">chi_m</span> <span class="o">=</span> <span class="p">(</span><span class="n">mass_ratio</span><span class="o">*</span><span class="n">spin1</span><span class="o">-</span><span class="n">spin2</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">mass_ratio</span><span class="p">)</span>
+        <span class="n">delta</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="mi">4</span><span class="o">*</span><span class="n">eta</span><span class="p">)</span><span class="o">**</span><span class="mf">0.5</span>
+        <span class="n">chi_eff</span> <span class="o">=</span> <span class="mf">0.5</span><span class="o">*</span><span class="p">(</span><span class="n">delta</span><span class="o">*</span><span class="n">chi_p</span><span class="o">+</span><span class="n">chi_m</span><span class="p">)</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="p">{(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">):</span><span class="mf">1.</span><span class="p">}</span>
+        <span class="n">A</span><span class="p">[(</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">)]</span> <span class="o">=</span> <span class="mf">0.43</span><span class="o">*</span><span class="p">(</span><span class="n">delta</span><span class="o">-</span><span class="n">chi_eff</span><span class="p">)</span>
+        <span class="n">A</span><span class="p">[(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="p">)]</span> <span class="o">=</span> <span class="mf">0.44</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="mi">4</span><span class="o">*</span><span class="n">eta</span><span class="p">)</span><span class="o">**</span><span class="mf">0.45</span>
+        <span class="n">A</span><span class="p">[(</span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">0</span><span class="p">)]</span> <span class="o">=</span> <span class="mf">5.4</span><span class="o">*</span><span class="p">(</span><span class="n">eta</span><span class="o">-</span><span class="mf">0.22</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="o">+</span><span class="mf">0.04</span>
+    
+    <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="c1">## use https://arxiv.org/abs/2005.03260</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">mass_ratio</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="p">{(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">):</span><span class="mf">1.</span><span class="p">}</span>
+        <span class="n">A</span><span class="p">[(</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">)]</span> <span class="o">=</span> <span class="mf">0.473846</span><span class="o">-</span><span class="mf">1.22756</span><span class="o">/</span><span class="n">q</span><span class="o">+</span><span class="mf">1.61047</span><span class="o">/</span><span class="n">q</span><span class="o">**</span><span class="mi">2</span><span class="o">-</span><span class="mf">0.85676</span><span class="o">/</span><span class="n">q</span><span class="o">**</span><span class="mi">3</span>
+        <span class="n">A</span><span class="p">[(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="p">)]</span> <span class="o">=</span> <span class="mf">0.439698</span><span class="o">-</span><span class="mf">0.611581</span><span class="o">/</span><span class="n">q</span><span class="o">+</span><span class="mf">0.199865</span><span class="o">/</span><span class="n">q</span><span class="o">**</span><span class="mi">2</span><span class="o">-</span><span class="mf">0.0279826</span><span class="o">/</span><span class="n">q</span><span class="o">**</span><span class="mi">3</span>
+        <span class="n">A</span><span class="p">[(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="mf">0.373974</span><span class="o">+</span><span class="mf">0.074412</span><span class="o">/</span><span class="n">q</span><span class="o">+</span><span class="mf">0.416288</span><span class="o">/</span><span class="n">q</span><span class="o">**</span><span class="mi">2</span><span class="o">-</span><span class="mf">0.322963</span><span class="o">/</span><span class="n">q</span><span class="o">**</span><span class="mi">3</span>
+
+    <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="c1">## use https://arxiv.org/abs/1710.02156</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">mass_ratio</span>
+        <span class="n">eta</span> <span class="o">=</span> <span class="n">mass_ratio</span><span class="o">/</span><span class="p">(</span><span class="n">mass_ratio</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+        <span class="n">delta</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="mi">4</span><span class="o">*</span><span class="n">eta</span><span class="p">)</span><span class="o">**</span><span class="mf">0.5</span>
+        <span class="n">chi_p</span> <span class="o">=</span> <span class="p">(</span><span class="n">mass_ratio</span><span class="o">*</span><span class="n">spin1</span><span class="o">+</span><span class="n">spin2</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">mass_ratio</span><span class="p">)</span>
+        <span class="n">chi_m</span> <span class="o">=</span> <span class="p">(</span><span class="n">mass_ratio</span><span class="o">*</span><span class="n">spin1</span><span class="o">-</span><span class="n">spin2</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">mass_ratio</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">EMOP</span><span class="p">():</span>
+            <span class="n">modes</span> <span class="o">=</span> <span class="p">((</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">),(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="p">),(</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">),(</span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span>
+            <span class="n">Amode0</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">Amode1</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="c1">## nonspinning coefficients</span>
+            <span class="n">coeffs</span> <span class="o">=</span> <span class="p">{(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">):(</span><span class="mf">0.303</span><span class="p">,</span><span class="mf">0.571</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span>\
+                    <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="p">):(</span><span class="mf">0.157</span><span class="p">,</span><span class="mf">0.671</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span>\
+                    <span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">):(</span><span class="mf">0.099</span><span class="p">,</span><span class="mf">0.06</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span>\
+                    <span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">0</span><span class="p">):(</span><span class="mf">0.122</span><span class="p">,</span><span class="o">-</span><span class="mf">0.188</span><span class="p">,</span><span class="o">-</span><span class="mf">0.964</span><span class="p">)}</span>
+            <span class="k">for</span> <span class="n">mode</span> <span class="ow">in</span> <span class="n">modes</span><span class="p">:</span>
+                <span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">c</span> <span class="o">=</span> <span class="n">coeffs</span><span class="p">[</span><span class="n">mode</span><span class="p">]</span>
+                <span class="n">Amode0</span><span class="p">[</span><span class="n">mode</span><span class="p">]</span> <span class="o">=</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span><span class="o">*</span><span class="n">eta</span> <span class="o">+</span> <span class="n">c</span><span class="o">*</span><span class="n">eta</span><span class="o">**</span><span class="mi">2</span>
+            <span class="c1">## spinning coefficients</span>
+            <span class="n">coeffs</span> <span class="o">=</span> <span class="p">{(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">):(</span><span class="o">-</span><span class="mf">0.07</span><span class="p">,</span><span class="mf">0.255</span><span class="p">,</span><span class="mf">0.189</span><span class="p">,</span><span class="o">-</span><span class="mf">0.013</span><span class="p">,</span><span class="mf">0.084</span><span class="p">),</span>\
+                    <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="p">):(</span><span class="mf">0.163</span><span class="p">,</span><span class="o">-</span><span class="mf">0.187</span><span class="p">,</span><span class="mf">0.021</span><span class="p">,</span><span class="mf">0.073</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span>\
+                    <span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">):(</span><span class="o">-</span><span class="mf">0.067</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span>\
+                    <span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">0</span><span class="p">):(</span><span class="o">-</span><span class="mf">0.207</span><span class="p">,</span><span class="mf">0.034</span><span class="p">,</span><span class="o">-</span><span class="mf">0.701</span><span class="p">,</span><span class="mf">1.387</span><span class="p">,</span><span class="mf">0.122</span><span class="p">)}</span>
+            <span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">d</span><span class="p">,</span><span class="n">e</span> <span class="o">=</span> <span class="n">coeffs</span><span class="p">[(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">)]</span>
+            <span class="n">Amode1</span><span class="p">[(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">)]</span> <span class="o">=</span> <span class="n">eta</span><span class="o">*</span><span class="n">chi_p</span><span class="o">*</span><span class="p">(</span><span class="n">a</span> <span class="o">+</span> <span class="n">b</span><span class="o">/</span><span class="n">q</span> <span class="o">+</span> <span class="n">c</span><span class="o">*</span><span class="n">q</span> <span class="o">+</span> <span class="n">d</span><span class="o">*</span><span class="n">q</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">e</span><span class="o">*</span><span class="n">delta</span><span class="o">*</span><span class="n">chi_m</span>
+            <span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">d</span><span class="p">,</span><span class="n">e</span> <span class="o">=</span> <span class="n">coeffs</span><span class="p">[(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="p">)]</span>
+            <span class="n">Amode1</span><span class="p">[(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="p">)]</span> <span class="o">=</span> <span class="n">eta</span><span class="o">*</span><span class="n">chi_m</span><span class="o">*</span><span class="p">(</span><span class="n">a</span> <span class="o">+</span> <span class="n">b</span><span class="o">/</span><span class="n">q</span> <span class="o">+</span> <span class="n">c</span><span class="o">*</span><span class="n">q</span><span class="p">)</span> <span class="o">+</span> <span class="n">d</span><span class="o">*</span><span class="n">delta</span><span class="o">*</span><span class="n">chi_p</span>
+            <span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">d</span><span class="p">,</span><span class="n">e</span> <span class="o">=</span> <span class="n">coeffs</span><span class="p">[(</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">)]</span>
+            <span class="n">Amode1</span><span class="p">[(</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">)]</span> <span class="o">=</span> <span class="n">a</span><span class="o">*</span><span class="n">chi_m</span>
+            <span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">d</span><span class="p">,</span><span class="n">e</span> <span class="o">=</span> <span class="n">coeffs</span><span class="p">[(</span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">0</span><span class="p">)]</span>
+            <span class="n">Amode1</span><span class="p">[(</span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">0</span><span class="p">)]</span> <span class="o">=</span> <span class="n">eta</span><span class="o">*</span><span class="n">chi_p</span><span class="o">*</span><span class="p">(</span><span class="n">a</span><span class="o">/</span><span class="n">q</span> <span class="o">+</span> <span class="n">b</span><span class="o">*</span><span class="n">q</span><span class="p">)</span> <span class="o">+</span> <span class="n">delta</span><span class="o">*</span><span class="n">eta</span><span class="o">*</span><span class="n">chi_m</span><span class="o">*</span><span class="p">(</span><span class="n">c</span> <span class="o">+</span> <span class="n">d</span><span class="o">/</span><span class="n">q</span> <span class="o">+</span> <span class="n">e</span><span class="o">*</span><span class="n">q</span><span class="p">)</span>
+            <span class="c1">## combine</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">mode</span> <span class="ow">in</span> <span class="n">modes</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">mode</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">%</span><span class="mi">2</span><span class="p">:</span>
+                    <span class="n">out</span><span class="p">[</span><span class="n">mode</span><span class="p">]</span> <span class="o">=</span> <span class="n">eta</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">Amode0</span><span class="p">[</span><span class="n">mode</span><span class="p">]</span><span class="o">*</span><span class="n">delta</span> <span class="o">+</span> <span class="n">Amode1</span><span class="p">[</span><span class="n">mode</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">out</span><span class="p">[</span><span class="n">mode</span><span class="p">]</span> <span class="o">=</span> <span class="n">eta</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">Amode0</span><span class="p">[</span><span class="n">mode</span><span class="p">]</span> <span class="o">+</span> <span class="n">Amode1</span><span class="p">[</span><span class="n">mode</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span>
+            <span class="k">return</span> <span class="n">out</span>
+        <span class="n">emops</span> <span class="o">=</span> <span class="n">EMOP</span><span class="p">()</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">emops</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">A</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">emops</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">/</span><span class="n">emops</span><span class="p">[(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">)])</span><span class="o">**</span><span class="mf">0.5</span>
+        <span class="n">spin_f</span> <span class="o">=</span> <span class="n">final_spin</span><span class="p">(</span><span class="n">mass_ratio</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">spin1</span><span class="p">,</span><span class="n">spin2</span><span class="p">)</span>
+        <span class="n">f_22</span><span class="p">,</span> <span class="n">tau_22</span> <span class="o">=</span> <span class="n">qnm_Kerr</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">spin_f</span><span class="p">,(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;interp&#39;</span><span class="p">)</span>
+        <span class="n">w_22</span> <span class="o">=</span> <span class="n">tau_22</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="mi">4</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">f_22</span><span class="o">**</span><span class="mi">2</span><span class="o">+</span><span class="n">tau_22</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">emops</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">f_mode</span><span class="p">,</span> <span class="n">tau_mode</span> <span class="o">=</span> <span class="n">qnm_Kerr</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">spin_f</span><span class="p">,</span><span class="n">k</span><span class="p">,</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;interp&#39;</span><span class="p">)</span>
+            <span class="n">w_mode</span> <span class="o">=</span> <span class="n">tau_mode</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="mi">4</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">f_mode</span><span class="o">**</span><span class="mi">2</span><span class="o">+</span><span class="n">tau_mode</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">A</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">*=</span> <span class="p">(</span><span class="n">w_mode</span><span class="o">/</span><span class="n">w_22</span><span class="p">)</span><span class="o">**</span><span class="mf">0.5</span>
+
+    <span class="k">return</span> <span class="n">A</span><span class="p">[</span><span class="n">mode</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="ringdown_absolute_amplitudes"><a class="viewcode-back" href="../../../fishergw.ringdown.html#fishergw.ringdown.utils.ringdown_absolute_amplitudes">[docs]</a><span class="k">def</span> <span class="nf">ringdown_absolute_amplitudes</span><span class="p">(</span><span class="n">mass_f</span><span class="p">,</span><span class="n">mass_ratio</span><span class="p">,</span><span class="n">spin1</span><span class="p">,</span><span class="n">spin2</span><span class="p">,</span><span class="n">d_L</span><span class="p">,</span><span class="n">mode</span><span class="p">,</span><span class="n">method</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="n">eta</span> <span class="o">=</span> <span class="n">mass_ratio</span><span class="o">/</span><span class="p">(</span><span class="n">mass_ratio</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="p">{(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">):</span><span class="mf">0.864</span><span class="o">*</span><span class="n">eta</span><span class="o">*</span><span class="n">mass_f</span><span class="o">*</span><span class="n">tsun</span><span class="o">*</span><span class="n">cc</span><span class="o">/</span><span class="n">Mpc</span><span class="o">/</span><span class="n">d_L</span><span class="p">}</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">ringdown_relative_amplitudes</span><span class="p">(</span><span class="n">mass_ratio</span><span class="p">,</span><span class="n">spin1</span><span class="p">,</span><span class="n">spin2</span><span class="p">,</span><span class="n">mode</span><span class="p">,</span><span class="n">method</span><span class="p">)</span><span class="o">*</span><span class="n">A</span><span class="p">[(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">)]</span>
+    <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="qnm_Kerr"><a class="viewcode-back" href="../../../fishergw.ringdown.html#fishergw.ringdown.utils.qnm_Kerr">[docs]</a><span class="k">def</span> <span class="nf">qnm_Kerr</span><span class="p">(</span><span class="n">mass</span><span class="p">,</span><span class="n">spin</span><span class="p">,</span><span class="n">mode</span><span class="p">,</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;interp&#39;</span><span class="p">,</span><span class="n">interp_qnm</span><span class="o">=</span><span class="p">{}):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the frequency and the damping time of a Kerr black hole</span>
+<span class="sd">    for a given mass, spin and mode.</span>
+
+<span class="sd">    :param mass: Mass of the black hole [:math:`M_\odot`].</span>
+<span class="sd">    :type mass: float</span>
+
+<span class="sd">    :param spin: Dimensionless spin.</span>
+<span class="sd">    :type spin: float</span>
+
+<span class="sd">    :param mode: Angular, azimuthal and overtone number in the form (l,m,n).</span>
+<span class="sd">    :type mode: tuple</span>
+
+<span class="sd">    :param method: The method used to approximate the Kerr spectrum. If `fit1`, it uses the fits provided in https://arxiv.org/abs/gr-qc/0512160. If `fit2`, it uses the fits provided in the appendix of https://arxiv.org/abs/2109.13961. If `interp`, it interpolates from the numerical tables provided in https://pages.jh.edu/eberti2/ringdown/. Deafault: `interp`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+   
+    <span class="n">methods</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;fit1&#39;</span><span class="p">,</span><span class="s1">&#39;fit2&#39;</span><span class="p">,</span><span class="s1">&#39;interp&#39;</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">methods</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;method should be one of &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">methods</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">method</span><span class="o">==</span><span class="s1">&#39;fit1&#39;</span><span class="p">:</span>
+        <span class="c1">## use https://arxiv.org/abs/gr-qc/0512160</span>
+        <span class="n">coeffs</span> <span class="o">=</span> <span class="p">{(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">):(</span><span class="mf">1.5251</span><span class="p">,</span><span class="o">-</span><span class="mf">1.1568</span><span class="p">,</span><span class="mf">0.1292</span><span class="p">,</span><span class="mf">0.7</span><span class="p">,</span><span class="mf">1.4187</span><span class="p">,</span><span class="o">-</span><span class="mf">0.4990</span><span class="p">),</span>\
+                  <span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">):(</span><span class="mf">1.3673</span><span class="p">,</span><span class="o">-</span><span class="mf">1.0260</span><span class="p">,</span><span class="mf">0.1628</span><span class="p">,</span><span class="mf">0.1</span><span class="p">,</span><span class="mf">0.5436</span><span class="p">,</span><span class="o">-</span><span class="mf">0.4731</span><span class="p">),</span>\
+                  <span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">):(</span><span class="mf">0.6</span><span class="p">,</span><span class="o">-</span><span class="mf">0.2339</span><span class="p">,</span><span class="mf">0.4175</span><span class="p">,</span><span class="o">-</span><span class="mf">0.3</span><span class="p">,</span><span class="mf">2.3561</span><span class="p">,</span><span class="o">-</span><span class="mf">0.2277</span><span class="p">),</span>\
+                  <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="p">):(</span><span class="mf">1.8956</span><span class="p">,</span><span class="o">-</span><span class="mf">1.3043</span><span class="p">,</span><span class="mf">0.1818</span><span class="p">,</span><span class="mf">0.9</span><span class="p">,</span><span class="mf">2.3430</span><span class="p">,</span><span class="o">-</span><span class="mf">0.481</span><span class="p">),</span>\
+                  <span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">0</span><span class="p">):(</span><span class="mf">2.3</span><span class="p">,</span><span class="o">-</span><span class="mf">1.5056</span><span class="p">,</span><span class="mf">0.2244</span><span class="p">,</span><span class="mf">1.1929</span><span class="p">,</span><span class="mf">3.1191</span><span class="p">,</span><span class="o">-</span><span class="mf">0.4825</span><span class="p">)}</span>
+        <span class="n">f1</span><span class="p">,</span> <span class="n">f2</span><span class="p">,</span> <span class="n">f3</span><span class="p">,</span> <span class="n">q1</span><span class="p">,</span> <span class="n">q2</span><span class="p">,</span> <span class="n">q3</span> <span class="o">=</span> <span class="n">coeffs</span><span class="p">[</span><span class="n">mode</span><span class="p">]</span>
+        <span class="n">omega</span> <span class="o">=</span> <span class="p">(</span><span class="n">f1</span><span class="o">+</span><span class="n">f2</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">spin</span><span class="p">)</span><span class="o">**</span><span class="n">f3</span><span class="p">)</span><span class="o">/</span><span class="n">mass</span><span class="o">/</span><span class="n">tsun</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">omega</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+        <span class="n">Q</span> <span class="o">=</span> <span class="n">q1</span><span class="o">+</span><span class="n">q2</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">spin</span><span class="p">)</span><span class="o">**</span><span class="n">q3</span>
+        <span class="n">tau</span> <span class="o">=</span> <span class="n">Q</span><span class="o">/</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">f</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="n">method</span><span class="o">==</span><span class="s1">&#39;fit2&#39;</span><span class="p">:</span>
+        <span class="c1">## use https://arxiv.org/abs/2109.13961</span>
+        <span class="n">BR</span> <span class="o">=</span> <span class="p">{(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">):</span> <span class="mf">0.37367168</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mf">1.899567</span><span class="p">,</span><span class="mf">1.015454</span><span class="p">,</span><span class="o">-</span><span class="mf">0.111430</span><span class="p">]),</span>\
+            <span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">):</span> <span class="mf">0.34671099</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mf">1.850299</span><span class="p">,</span><span class="mf">0.944088</span><span class="p">,</span><span class="o">-</span><span class="mf">0.088458</span><span class="p">]),</span>\
+            <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="p">):</span> <span class="mf">0.59944329</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mf">1.928277</span><span class="p">,</span><span class="mf">1.044039</span><span class="p">,</span><span class="o">-</span><span class="mf">0.112303</span><span class="p">])}</span>
+        <span class="c1">##</span>
+        <span class="n">CR</span> <span class="o">=</span> <span class="p">{(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">):</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mf">2.238461</span><span class="p">,</span><span class="mf">1.581677</span><span class="p">,</span><span class="o">-</span><span class="mf">0.341455</span><span class="p">]),</span>\
+            <span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">):</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mf">2.250169</span><span class="p">,</span><span class="mf">1.611393</span><span class="p">,</span><span class="o">-</span><span class="mf">0.359285</span><span class="p">]),</span>\
+            <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="p">):</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mf">2.265230</span><span class="p">,</span><span class="mf">1.624332</span><span class="p">,</span><span class="o">-</span><span class="mf">0.357651</span><span class="p">])}</span>
+        <span class="c1">##</span>
+        <span class="n">BI</span> <span class="o">=</span> <span class="p">{(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">):</span> <span class="mf">0.08896232</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mf">2.533958</span><span class="p">,</span><span class="mf">2.102750</span><span class="p">,</span><span class="o">-</span><span class="mf">0.568636</span><span class="p">]),</span>\
+            <span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">):</span> <span class="mf">0.27391488</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mf">0.366066</span><span class="p">,</span><span class="o">-</span><span class="mf">3.290350</span><span class="p">,</span><span class="mf">1.927196</span><span class="p">]),</span>\
+            <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="p">):</span> <span class="mf">0.09270305</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mf">2.163575</span><span class="p">,</span><span class="mf">1.405496</span><span class="p">,</span><span class="o">-</span><span class="mf">0.241561</span><span class="p">])}</span>
+        <span class="c1">##</span>
+        <span class="n">CI</span> <span class="o">=</span> <span class="p">{(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">):</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mf">2.498341</span><span class="p">,</span><span class="mf">2.056918</span><span class="p">,</span><span class="o">-</span><span class="mf">0.557557</span><span class="p">]),</span>\
+            <span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">):</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mf">0.388928</span><span class="p">,</span><span class="o">-</span><span class="mf">3.119527</span><span class="p">,</span><span class="mf">1.746957</span><span class="p">]),</span>\
+            <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="p">):</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mf">2.130446</span><span class="p">,</span><span class="mf">1.394144</span><span class="p">,</span><span class="o">-</span><span class="mf">0.261229</span><span class="p">])}</span>
+        <span class="c1">##</span>
+        <span class="n">ss</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">spin</span><span class="o">**</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">)])</span>
+        <span class="n">omegaR</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">BR</span><span class="p">[</span><span class="n">mode</span><span class="p">]</span><span class="o">*</span><span class="n">ss</span><span class="p">)</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">CR</span><span class="p">[</span><span class="n">mode</span><span class="p">]</span><span class="o">*</span><span class="n">ss</span><span class="p">)</span>
+        <span class="n">omegaI</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">BI</span><span class="p">[</span><span class="n">mode</span><span class="p">]</span><span class="o">*</span><span class="n">ss</span><span class="p">)</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">CI</span><span class="p">[</span><span class="n">mode</span><span class="p">]</span><span class="o">*</span><span class="n">ss</span><span class="p">)</span>
+        <span class="c1"># f and tau</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">omegaR</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span><span class="o">/</span><span class="n">mass</span><span class="o">/</span><span class="n">tsun</span>
+        <span class="n">tau</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="n">omegaI</span><span class="o">*</span><span class="n">mass</span><span class="o">*</span><span class="n">tsun</span>
+
+    <span class="k">elif</span> <span class="n">method</span><span class="o">==</span><span class="s1">&#39;interp&#39;</span><span class="p">:</span>
+        <span class="c1">## use numerical tables provided in https://pages.jh.edu/eberti2/ringdown/</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="ow">in</span> <span class="n">interp_qnm</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">omega_interp</span><span class="p">,</span> <span class="n">tau_interp_m1</span> <span class="o">=</span> <span class="n">interp_qnm</span><span class="p">[</span><span class="n">mode</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">filename</span> <span class="o">=</span> <span class="n">dir_path</span><span class="o">+</span><span class="s1">&#39;/qnm_data/</span><span class="si">%s%s%s</span><span class="s1">.dat&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">mode</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">mode</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="n">mode</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+            <span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">,</span><span class="n">_</span><span class="p">,</span><span class="n">_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+            <span class="n">omega_interp</span> <span class="o">=</span> <span class="n">interp1d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">)</span><span class="c1">#,kind=&#39;cubic&#39;)</span>
+            <span class="n">tau_interp_m1</span> <span class="o">=</span> <span class="n">interp1d</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="o">-</span><span class="n">z</span><span class="p">)</span><span class="c1">#,kind=&#39;cubic&#39;)</span>
+            <span class="n">interp_qnm</span><span class="p">[</span><span class="n">mode</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">omega_interp</span><span class="p">,</span><span class="n">tau_interp_m1</span><span class="p">)</span>
+
+        <span class="n">omega</span> <span class="o">=</span> <span class="n">omega_interp</span><span class="p">(</span><span class="n">spin</span><span class="p">)</span><span class="o">/</span><span class="n">mass</span><span class="o">/</span><span class="n">tsun</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">omega</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+        <span class="n">tau</span> <span class="o">=</span> <span class="n">mass</span><span class="o">*</span><span class="n">tsun</span><span class="o">/</span><span class="n">tau_interp_m1</span><span class="p">(</span><span class="n">spin</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">f</span><span class="p">,</span> <span class="n">tau</span></div>
+
+<div class="viewcode-block" id="invert_qnm_from_f"><a class="viewcode-back" href="../../../fishergw.ringdown.html#fishergw.ringdown.utils.invert_qnm_from_f">[docs]</a><span class="k">def</span> <span class="nf">invert_qnm_from_f</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="n">mode</span><span class="p">,</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;fit2&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the masses (in units if solar masses) and dimensionless spins compatible with a given QNM frequency, assuming it is generated from the Kerr spectrum.</span>
+<span class="sd">    </span>
+<span class="sd">    :param f: freqency [Hz].</span>
+<span class="sd">    :type f: float</span>
+
+<span class="sd">    :param mode: the QNM numbers (l,m,n).</span>
+<span class="sd">    :type mode: tuple</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#spins = np.linspace(-0.998,0.998,200)</span>
+    <span class="n">spins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.998</span><span class="p">,</span><span class="mi">100</span><span class="p">)</span>
+    <span class="n">qnms</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">qnm_Kerr</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">spin</span><span class="p">,</span><span class="n">mode</span><span class="p">,</span><span class="n">method</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">spin</span> <span class="ow">in</span> <span class="n">spins</span><span class="p">])</span>
+    <span class="n">masses</span> <span class="o">=</span> <span class="n">qnms</span><span class="o">/</span><span class="n">f</span>
+    <span class="k">return</span> <span class="n">masses</span><span class="p">,</span><span class="n">spins</span></div>
+
+<div class="viewcode-block" id="invert_qnm_from_tau"><a class="viewcode-back" href="../../../fishergw.ringdown.html#fishergw.ringdown.utils.invert_qnm_from_tau">[docs]</a><span class="k">def</span> <span class="nf">invert_qnm_from_tau</span><span class="p">(</span><span class="n">tau</span><span class="p">,</span><span class="n">mode</span><span class="p">,</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;fit2&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the masses (in units of solar masses) and spins compatible with a given QNM damping time, assuming it is generated from the Kerr spectrum.</span>
+<span class="sd">    </span>
+<span class="sd">    :param tau: damping time [s].</span>
+<span class="sd">    :type tau: float</span>
+
+<span class="sd">    :param mode: the QNM numbers (l,m,n).</span>
+<span class="sd">    :type mode: tuple</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#spins = np.linspace(-0.998,0.998,200)</span>
+    <span class="n">spins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.998</span><span class="p">,</span><span class="mi">100</span><span class="p">)</span>
+    <span class="n">qnms</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">qnm_Kerr</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">spin</span><span class="p">,</span><span class="n">mode</span><span class="p">,</span><span class="n">method</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">spin</span> <span class="ow">in</span> <span class="n">spins</span><span class="p">])</span>
+    <span class="n">masses</span> <span class="o">=</span> <span class="n">tau</span><span class="o">/</span><span class="n">qnms</span>
+    <span class="k">return</span> <span class="n">masses</span><span class="p">,</span><span class="n">spins</span></div>
+
+
+<div class="viewcode-block" id="invert_qnm_from_ff"><a class="viewcode-back" href="../../../fishergw.ringdown.html#fishergw.ringdown.utils.invert_qnm_from_ff">[docs]</a><span class="k">def</span> <span class="nf">invert_qnm_from_ff</span><span class="p">(</span><span class="n">f1</span><span class="p">,</span><span class="n">f2</span><span class="p">,</span><span class="n">mode1</span><span class="p">,</span><span class="n">mode2</span><span class="p">,</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;fit2&#39;</span><span class="p">,</span><span class="n">qnm_invert</span><span class="o">=</span><span class="p">{}):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the mass (in units of solar masses) and the dimensionless spin corresponding to a pair of frequencies, assuming they are generated from the Kerr spectrum.</span>
+
+<span class="sd">    :param f1: The first frequency [Hz].</span>
+<span class="sd">    :type f1: float</span>
+
+<span class="sd">    :param f2: The second frequency [Hz].</span>
+<span class="sd">    :type f2: float</span>
+
+<span class="sd">    :param mode1: The set (l,m,n) of angular and overtone numbers of the first frequency.</span>
+<span class="sd">    :type mode1: tuple</span>
+
+<span class="sd">    :param mode2: The set (l,m,n) of angular oand overtone numbers of the second frequency.</span>
+<span class="sd">    :type mode2: tuple</span>
+
+<span class="sd">    :param method: The method used to approximate the Kerr spectrum. See methods available in the \qnm_Kerr function.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">mode1</span> <span class="o">==</span> <span class="n">mode2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;mode1 and mode2 cannot be the same&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">f_ratio</span><span class="p">(</span><span class="n">spins</span><span class="p">):</span>
+        <span class="n">f1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">qnm_Kerr</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">spin</span><span class="p">,</span><span class="n">mode1</span><span class="p">,</span><span class="n">method</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">spin</span> <span class="ow">in</span> <span class="n">spins</span><span class="p">])</span>
+        <span class="n">f2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">qnm_Kerr</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">spin</span><span class="p">,</span><span class="n">mode2</span><span class="p">,</span><span class="n">method</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">spin</span> <span class="ow">in</span> <span class="n">spins</span><span class="p">])</span>
+        <span class="c1">#f1 = qnm_Kerr(1,spin,mode1,method)[0]</span>
+        <span class="c1">#f2 = qnm_Kerr(1,spin,mode2,method)[0]</span>
+        <span class="k">return</span> <span class="n">f1</span><span class="o">/</span><span class="n">f2</span>
+    
+    <span class="k">if</span> <span class="p">(</span><span class="n">mode1</span><span class="p">,</span><span class="n">mode2</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">qnm_invert</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="c1">#X = np.linspace(-0.998,0.998,200)</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span><span class="mf">0.998</span><span class="p">,</span><span class="mi">100</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">f_ratio</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+        <span class="n">qnm_invert</span><span class="p">[(</span><span class="n">mode1</span><span class="p">,</span><span class="n">mode2</span><span class="p">)]</span> <span class="o">=</span> <span class="n">interp1d</span><span class="p">(</span><span class="n">y</span><span class="p">,</span><span class="n">X</span><span class="p">)</span><span class="c1">#,kind=&#39;cubic&#39;)</span>
+  
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1">#spin = bisect(lambda x: f_ratio(x)-f1/f2,0.,0.998)</span>
+        <span class="n">spin</span> <span class="o">=</span> <span class="n">qnm_invert</span><span class="p">[(</span><span class="n">mode1</span><span class="p">,</span><span class="n">mode2</span><span class="p">)](</span><span class="n">f1</span><span class="o">/</span><span class="n">f2</span><span class="p">)</span>
+        <span class="n">spin</span> <span class="o">=</span> <span class="n">spin</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+        <span class="n">mass</span> <span class="o">=</span> <span class="n">qnm_Kerr</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">spin</span><span class="p">,</span><span class="n">mode1</span><span class="p">,</span><span class="n">method</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="n">f1</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="n">spin</span> <span class="o">=</span> <span class="mi">10</span>
+        <span class="n">mass</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">return</span> <span class="n">mass</span><span class="p">,</span> <span class="n">spin</span></div>
+
+<div class="viewcode-block" id="invert_qnm_from_ftau"><a class="viewcode-back" href="../../../fishergw.ringdown.html#fishergw.ringdown.utils.invert_qnm_from_ftau">[docs]</a><span class="k">def</span> <span class="nf">invert_qnm_from_ftau</span><span class="p">(</span><span class="n">f1</span><span class="p">,</span><span class="n">tau2</span><span class="p">,</span><span class="n">mode1</span><span class="p">,</span><span class="n">mode2</span><span class="p">,</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;fit2&#39;</span><span class="p">,</span><span class="n">qnm_invert</span><span class="o">=</span><span class="p">{}):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the mass (in units of solar masses) and the dimensionless spin corresponding to a frequency and a damping time, assuming they are generated from the Kerr spectrum.</span>
+
+<span class="sd">    :param f1: The frequency [Hz].</span>
+<span class="sd">    :type f1: float</span>
+
+<span class="sd">    :param f2: The damping time [s].</span>
+<span class="sd">    :type f2: float</span>
+
+<span class="sd">    :param mode1: The set (l,m,n) of angular and overtone numbers of the frequency.</span>
+<span class="sd">    :type mode1: tuple</span>
+
+<span class="sd">    :param mode2: The set (l,m,n) of angular oand overtone numbers of the damping time.</span>
+<span class="sd">    :type mode2: tuple</span>
+
+<span class="sd">    :param method: The method used to approximate the Kerr spectrum. See methods available in the \qnm_Kerr function.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">ftau_product</span><span class="p">(</span><span class="n">spins</span><span class="p">):</span>
+        <span class="n">f1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">qnm_Kerr</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">spin</span><span class="p">,</span><span class="n">mode1</span><span class="p">,</span><span class="n">method</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">spin</span> <span class="ow">in</span> <span class="n">spins</span><span class="p">])</span>
+        <span class="n">tau2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">qnm_Kerr</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">spin</span><span class="p">,</span><span class="n">mode2</span><span class="p">,</span><span class="n">method</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">spin</span> <span class="ow">in</span> <span class="n">spins</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">f1</span><span class="o">*</span><span class="n">tau2</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">mode1</span><span class="p">,</span><span class="n">mode2</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">qnm_invert</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="c1">#X = np.linspace(-0.998,0.998,200)</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span><span class="mf">0.998</span><span class="p">,</span><span class="mi">100</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">ftau_product</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+        <span class="n">qnm_invert</span><span class="p">[(</span><span class="n">mode1</span><span class="p">,</span><span class="n">mode2</span><span class="p">)]</span> <span class="o">=</span> <span class="n">interp1d</span><span class="p">(</span><span class="n">y</span><span class="p">,</span><span class="n">X</span><span class="p">)</span><span class="c1">#,kind=&#39;cubic&#39;)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">spin</span> <span class="o">=</span> <span class="n">qnm_invert</span><span class="p">[(</span><span class="n">mode1</span><span class="p">,</span><span class="n">mode2</span><span class="p">)](</span><span class="n">f1</span><span class="o">*</span><span class="n">tau2</span><span class="p">)</span>
+        <span class="n">mass</span> <span class="o">=</span> <span class="n">qnm_Kerr</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">spin</span><span class="p">,</span><span class="n">mode1</span><span class="p">,</span><span class="n">method</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="n">f1</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="n">spin</span> <span class="o">=</span> <span class="mi">10</span>
+        <span class="n">mass</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">return</span> <span class="n">mass</span><span class="p">,</span> <span class="n">spin</span></div>
+
+<div class="viewcode-block" id="invert_qnm_from_tautau"><a class="viewcode-back" href="../../../fishergw.ringdown.html#fishergw.ringdown.utils.invert_qnm_from_tautau">[docs]</a><span class="k">def</span> <span class="nf">invert_qnm_from_tautau</span><span class="p">(</span><span class="n">tau1</span><span class="p">,</span><span class="n">tau2</span><span class="p">,</span><span class="n">mode1</span><span class="p">,</span><span class="n">mode2</span><span class="p">,</span><span class="n">method</span><span class="o">=</span><span class="s1">&#39;fit2&#39;</span><span class="p">,</span><span class="n">qnm_invert</span><span class="o">=</span><span class="p">{}):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the mass (in units of solar masses) and the dimensionless spin corresponding to a pair of damping times, assuming they are generated from the Kerr spectrum.</span>
+
+<span class="sd">    :param f1: The first damping time.</span>
+<span class="sd">    :type f1: float</span>
+
+<span class="sd">    :param f2: The second damping time.</span>
+<span class="sd">    :type f2: float</span>
+
+<span class="sd">    :param mode1: The set (l,m,n) of angular and overtone numbers of the first damping time.</span>
+<span class="sd">    :type mode1: tuple</span>
+
+<span class="sd">    :param mode2: The set (l,m,n) of angular oand overtone numbers of the second damping time.</span>
+<span class="sd">    :type mode2: typle</span>
+
+<span class="sd">    :param method: The method used to approximate the Kerr spectrum. See methods available in the \qnm_Kerr function.</span>
+
+<span class="sd">    .. note::</span>
+
+<span class="sd">    The use of ``fit1`` methods can be badly posed for certain combination of modes, because the ratio tau1/tau2 is not monotonic. This is just an artifact of the ``fit1`` method and it does not happen with other methods.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">mode1</span> <span class="o">==</span> <span class="n">mode2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;mode1 and mode2 cannot be the same&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">tautau_ratio</span><span class="p">(</span><span class="n">spins</span><span class="p">):</span>
+        <span class="n">tau1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">qnm_Kerr</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">spin</span><span class="p">,</span><span class="n">mode1</span><span class="p">,</span><span class="n">method</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">spin</span> <span class="ow">in</span> <span class="n">spins</span><span class="p">])</span>
+        <span class="n">tau2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">qnm_Kerr</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">spin</span><span class="p">,</span><span class="n">mode2</span><span class="p">,</span><span class="n">method</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">spin</span> <span class="ow">in</span> <span class="n">spins</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">tau1</span><span class="o">/</span><span class="n">tau2</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">mode1</span><span class="p">,</span><span class="n">mode2</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">qnm_invert</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="c1">#X = np.linspace(-0.998,0.998,200)</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span><span class="mf">0.998</span><span class="p">,</span><span class="mi">100</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">tautau_ratio</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+        <span class="n">qnm_invert</span><span class="p">[(</span><span class="n">mode1</span><span class="p">,</span><span class="n">mode2</span><span class="p">)]</span> <span class="o">=</span> <span class="n">interp1d</span><span class="p">(</span><span class="n">y</span><span class="p">,</span><span class="n">X</span><span class="p">)</span><span class="c1">#,kind=&#39;cubic&#39;)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1">#spin = bisect(lambda x: tautau_ratio(x)-tau1/tau2,0.,0.998)</span>
+        <span class="n">spin</span> <span class="o">=</span> <span class="n">qnm_invert</span><span class="p">[(</span><span class="n">mode1</span><span class="p">,</span><span class="n">mode2</span><span class="p">)](</span><span class="n">tau1</span><span class="o">/</span><span class="n">tau2</span><span class="p">)</span>
+        <span class="n">mass</span> <span class="o">=</span> <span class="n">tau1</span><span class="o">/</span><span class="n">qnm_Kerr</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">spin</span><span class="p">,</span><span class="n">mode1</span><span class="p">,</span><span class="n">method</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="n">spin</span> <span class="o">=</span> <span class="mi">10</span>
+        <span class="n">mass</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">return</span> <span class="n">mass</span><span class="p">,</span> <span class="n">spin</span></div>
+
+<div class="viewcode-block" id="r_isco"><a class="viewcode-back" href="../../../fishergw.ringdown.html#fishergw.ringdown.utils.r_isco">[docs]</a><span class="k">def</span> <span class="nf">r_isco</span><span class="p">(</span><span class="n">spin</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the dimensionless ISCO radius for a given dimensionless spin.</span>
+
+<span class="sd">    :param spin: Dimensionless spin.</span>
+<span class="sd">    :type spin: float</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">Z1</span> <span class="o">=</span> <span class="mi">1</span><span class="o">+</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">spin</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">)</span><span class="o">*</span><span class="p">((</span><span class="mi">1</span><span class="o">+</span><span class="n">spin</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">)</span><span class="o">+</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">spin</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">))</span>
+    <span class="n">Z2</span> <span class="o">=</span> <span class="p">(</span><span class="mi">3</span><span class="o">*</span><span class="n">spin</span><span class="o">**</span><span class="mi">2</span><span class="o">+</span><span class="n">Z1</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="mf">0.5</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="mi">3</span><span class="o">+</span><span class="n">Z2</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">spin</span><span class="p">)</span><span class="o">*</span><span class="p">((</span><span class="mi">3</span><span class="o">-</span><span class="n">Z1</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mi">3</span><span class="o">+</span><span class="n">Z1</span><span class="o">+</span><span class="mi">2</span><span class="o">*</span><span class="n">Z2</span><span class="p">))</span><span class="o">**</span><span class="mf">0.5</span>
+    <span class="k">return</span> <span class="n">out</span></div>
+
+<div class="viewcode-block" id="E_isco"><a class="viewcode-back" href="../../../fishergw.ringdown.html#fishergw.ringdown.utils.E_isco">[docs]</a><span class="k">def</span> <span class="nf">E_isco</span><span class="p">(</span><span class="n">spin</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the dimensionless energy for a test particle at the ISCO of a Kerr black hole.</span>
+
+<span class="sd">    :param spin: Dimensionless spin.</span>
+<span class="sd">    :type spin: float</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="mi">2</span><span class="o">/</span><span class="mi">3</span><span class="o">/</span><span class="n">r_isco</span><span class="p">(</span><span class="n">spin</span><span class="p">))</span><span class="o">**</span><span class="mf">0.5</span></div>
+
+<div class="viewcode-block" id="L_isco"><a class="viewcode-back" href="../../../fishergw.ringdown.html#fishergw.ringdown.utils.L_isco">[docs]</a><span class="k">def</span> <span class="nf">L_isco</span><span class="p">(</span><span class="n">spin</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the dimensionless angular momentum for a test particle at the ISCO of a Kerr black hole.</span>
+
+<span class="sd">    :param spin: Dimensionless spin.</span>
+<span class="sd">    :type spin: float</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="mi">2</span><span class="o">/</span><span class="mi">3</span><span class="o">**</span><span class="mf">1.5</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="mi">3</span><span class="o">*</span><span class="n">r_isco</span><span class="p">(</span><span class="n">spin</span><span class="p">)</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="mf">0.5</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="final_mass"><a class="viewcode-back" href="../../../fishergw.ringdown.html#fishergw.ringdown.utils.final_mass">[docs]</a><span class="k">def</span> <span class="nf">final_mass</span><span class="p">(</span><span class="n">mass1</span><span class="p">,</span><span class="n">mass2</span><span class="p">,</span><span class="n">spin1</span><span class="p">,</span><span class="n">spin2</span><span class="p">,</span><span class="n">beta</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span><span class="n">gamma</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span><span class="n">method</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the final mass (in units of solar masses) of the Kerr black hole remnant of a quasi-circular binary black hole merger.</span>
+
+<span class="sd">    :param mass1: Mass of the primary component [:math:`M_\odot`].</span>
+<span class="sd">    :type mass1: float</span>
+
+<span class="sd">    :param mass2: Mass of the secondary component [:math:`M_\odot`].</span>
+<span class="sd">    :type mass2: float</span>
+
+<span class="sd">    :param spin1: Dimensionless spin of the primary component.</span>
+<span class="sd">    :type spin1: float</span>
+
+<span class="sd">    :param spin2: Dimensionless spin of the secondary component.</span>
+<span class="sd">    :type spin2: float</span>
+<span class="sd">    </span>
+<span class="sd">    :param beta: Angle between spin1 and the z direction. Default: 0.</span>
+<span class="sd">    :type beta: float</span>
+<span class="sd">    </span>
+<span class="sd">    :param gamma: Angle between spin2 and the z direction. Default: 0.</span>
+<span class="sd">    :type gamma: float</span>
+
+<span class="sd">    :param method: If 1, uses the fit in https://arxiv.org/abs/1206.3803. If 2, uses the fit in https://arxiv.org/abs/1508.07250. If 3, uses the fit in https://arxiv.org/abs/0807.2985. Default: 1.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">mass2</span><span class="o">&gt;</span><span class="n">mass1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;mass2 must be no more than mass1!&#39;</span><span class="p">)</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="n">mass2</span><span class="o">/</span><span class="n">mass1</span>
+    <span class="n">eta</span> <span class="o">=</span> <span class="n">q</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">q</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+    <span class="n">m_tot</span> <span class="o">=</span> <span class="n">mass1</span><span class="o">+</span><span class="n">mass2</span>
+
+    <span class="k">if</span> <span class="n">method</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+        <span class="c1">## use https://arxiv.org/abs/1206.3803</span>
+        <span class="n">a_tot</span> <span class="o">=</span> <span class="p">(</span><span class="n">spin1</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span><span class="o">+</span><span class="n">spin2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">gamma</span><span class="p">)</span><span class="o">*</span><span class="n">q</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">q</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+        <span class="n">p0</span><span class="p">,</span> <span class="n">p1</span> <span class="o">=</span> <span class="mf">0.04827</span><span class="p">,</span> <span class="mf">0.01707</span>
+        <span class="n">E_rad</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">E_isco</span><span class="p">(</span><span class="n">a_tot</span><span class="p">))</span><span class="o">*</span><span class="n">eta</span><span class="o">+</span>\
+               <span class="mi">4</span><span class="o">*</span><span class="n">eta</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="mi">4</span><span class="o">*</span><span class="n">p0</span><span class="o">+</span><span class="mi">16</span><span class="o">*</span><span class="n">p1</span><span class="o">*</span><span class="n">a_tot</span><span class="o">*</span><span class="p">(</span><span class="n">a_tot</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="o">+</span>\
+                <span class="n">E_isco</span><span class="p">(</span><span class="n">a_tot</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">m_rad</span> <span class="o">=</span> <span class="n">E_rad</span><span class="o">*</span><span class="n">m_tot</span>
+        <span class="n">m_fin</span> <span class="o">=</span> <span class="n">m_tot</span><span class="o">-</span><span class="n">m_rad</span>
+
+    <span class="k">elif</span> <span class="n">method</span><span class="o">==</span><span class="mi">2</span><span class="p">:</span>
+        <span class="c1">## use https://arxiv.org/abs/1508.07250</span>
+        <span class="n">a_tot</span> <span class="o">=</span> <span class="p">(</span><span class="n">spin1</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span><span class="o">+</span><span class="n">spin2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span><span class="o">*</span><span class="n">q</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">q</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">eta</span><span class="p">)</span>
+        <span class="n">E_rad</span> <span class="o">=</span> <span class="mf">0.0559745</span><span class="o">*</span><span class="n">eta</span><span class="o">+</span><span class="mf">0.580951</span><span class="o">*</span><span class="n">eta</span><span class="o">**</span><span class="mi">2</span><span class="o">-</span><span class="mf">0.960673</span><span class="o">*</span><span class="n">eta</span><span class="o">**</span><span class="mi">3</span><span class="o">+</span><span class="mf">3.35241</span><span class="o">*</span><span class="n">eta</span><span class="o">**</span><span class="mi">4</span>
+        <span class="n">E_rad</span> <span class="o">*=</span> <span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">a_tot</span><span class="o">*</span><span class="p">(</span><span class="o">-</span><span class="mf">0.00303023</span><span class="o">-</span><span class="mf">2.00661</span><span class="o">*</span><span class="n">eta</span><span class="o">+</span><span class="mf">7.70506</span><span class="o">*</span><span class="n">eta</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span>\
+                <span class="n">a_tot</span><span class="o">*</span><span class="p">(</span><span class="o">-</span><span class="mf">0.67144</span><span class="o">-</span><span class="mf">1.47569</span><span class="o">*</span><span class="n">eta</span><span class="o">+</span><span class="mf">7.30468</span><span class="o">*</span><span class="n">eta</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+        <span class="n">m_rad</span> <span class="o">=</span> <span class="n">E_rad</span><span class="o">*</span><span class="n">m_tot</span>
+        <span class="n">m_fin</span> <span class="o">=</span> <span class="n">m_tot</span><span class="o">-</span><span class="n">m_rad</span>
+
+    <span class="k">elif</span> <span class="n">method</span><span class="o">==</span><span class="mi">3</span><span class="p">:</span>
+        <span class="c1">## use https://arxiv.org/abs/0807.2985</span>
+        <span class="n">m0</span> <span class="o">=</span> <span class="mf">0.9515</span>
+        <span class="n">m1</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.013</span>
+        <span class="n">s0</span> <span class="o">=</span> <span class="mf">0.686</span>
+        <span class="n">s1</span> <span class="o">=</span> <span class="mf">0.15</span>
+        <span class="n">E_fin</span> <span class="o">=</span> <span class="mi">1</span><span class="o">+</span><span class="p">(</span><span class="n">m0</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="mi">4</span><span class="o">*</span><span class="n">eta</span><span class="o">+</span><span class="n">m1</span><span class="o">*</span><span class="mi">16</span><span class="o">*</span><span class="n">eta</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">spin1</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span><span class="o">+</span>\
+                                             <span class="n">spin2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">gamma</span><span class="p">))</span>
+        <span class="n">m_fin</span> <span class="o">=</span> <span class="n">m_tot</span><span class="o">*</span><span class="n">E_fin</span>
+
+    <span class="k">return</span> <span class="n">m_fin</span></div>
+
+
+<div class="viewcode-block" id="final_spin"><a class="viewcode-back" href="../../../fishergw.ringdown.html#fishergw.ringdown.utils.final_spin">[docs]</a><span class="k">def</span> <span class="nf">final_spin</span><span class="p">(</span><span class="n">mass1</span><span class="p">,</span><span class="n">mass2</span><span class="p">,</span><span class="n">spin1</span><span class="p">,</span><span class="n">spin2</span><span class="p">,</span><span class="n">beta</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span><span class="n">gamma</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span><span class="n">method</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the dimensionless final spin of the Kerr black hole remnant of a quasi-circular binary black hole merger.</span>
+
+<span class="sd">    :param mass1: Mass of the primary component [:math:`M_\odot`].</span>
+<span class="sd">    :type mass1: float</span>
+
+<span class="sd">    :param mass2: Mass of the secondary component [:math:`M_\odot`].</span>
+<span class="sd">    :type mass2: float</span>
+
+<span class="sd">    :param spin1: Dimensionless spin of the primary component.</span>
+<span class="sd">    :type spin1: float</span>
+
+<span class="sd">    :param spin2: Dimensionless spin of the secondary component.</span>
+<span class="sd">    :type spin2: float</span>
+<span class="sd">    </span>
+<span class="sd">    :param beta: Angle between spin1 and the z direction. Default: 0.</span>
+<span class="sd">    :type beta: float</span>
+<span class="sd">    </span>
+<span class="sd">    :param gamma: Angle between spin2 and the z direction. Default: 0.</span>
+<span class="sd">    :type gamma: float</span>
+
+<span class="sd">    :param method: If 1, uses the fit in https://arxiv.org/abs/0904.2577. If 2, uses the fit in https://arxiv.org/abs/1605.01938. If 3, uses the fit in https://arxiv.org/abs/1508.07250. If 4, uses the fit in https://arxiv.org/abs/0807.2985. Default: 2.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">mass2</span><span class="o">&gt;</span><span class="n">mass1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;mass2 must be no more than mass1!&#39;</span><span class="p">)</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="n">mass2</span><span class="o">/</span><span class="n">mass1</span>
+    <span class="n">eta</span> <span class="o">=</span> <span class="n">q</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">q</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+
+    <span class="k">if</span> <span class="n">method</span><span class="o">==</span><span class="mi">1</span><span class="p">:</span>
+        <span class="c1">## reproduces https://arxiv.org/abs/0904.2577</span>
+        <span class="c1">## deprecated, do not use it</span>
+        <span class="n">a_tot</span> <span class="o">=</span> <span class="p">(</span><span class="n">spin1</span><span class="o">+</span><span class="n">spin2</span><span class="o">*</span><span class="n">q</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">q</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">kappas</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">2</span><span class="o">*</span><span class="mi">3</span><span class="o">**</span><span class="mf">0.5</span><span class="p">,</span><span class="o">-</span><span class="mf">2.8904</span><span class="p">,</span><span class="o">-</span><span class="mf">0.1229</span><span class="p">],</span>\
+                <span class="p">[</span><span class="o">-</span><span class="mf">3.5171</span><span class="p">,</span><span class="mf">0.4537</span><span class="p">],</span>\
+                <span class="p">[</span><span class="mf">2.5763</span><span class="p">]]</span>
+        <span class="n">a_fin</span> <span class="o">=</span> <span class="n">a_tot</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">kappas</span><span class="p">)):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">kappas</span><span class="p">[</span><span class="n">i</span><span class="p">])):</span>
+                <span class="n">a_fin</span> <span class="o">+=</span> <span class="n">kappas</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span><span class="o">*</span><span class="n">eta</span><span class="o">**</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">i</span><span class="p">)</span><span class="o">*</span><span class="n">a_tot</span><span class="o">**</span><span class="n">j</span>
+
+    <span class="k">elif</span> <span class="n">method</span><span class="o">==</span><span class="mi">2</span><span class="p">:</span>
+        <span class="c1">## reproduces https://arxiv.org/abs/1605.01938</span>
+        <span class="n">a_tot</span> <span class="o">=</span> <span class="p">(</span><span class="n">spin1</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span><span class="o">+</span><span class="n">spin2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">gamma</span><span class="p">)</span><span class="o">*</span><span class="n">q</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">q</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+        <span class="n">xi</span> <span class="o">=</span> <span class="mf">0.41616</span>
+        <span class="n">a_eff</span> <span class="o">=</span> <span class="n">a_tot</span><span class="o">+</span><span class="n">xi</span><span class="o">*</span><span class="n">eta</span><span class="o">*</span><span class="p">(</span><span class="n">spin1</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span><span class="o">+</span><span class="n">spin2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">gamma</span><span class="p">))</span>
+        <span class="n">kappas</span> <span class="o">=</span> <span class="p">[[</span><span class="o">-</span><span class="mf">3.82</span><span class="p">,</span><span class="o">-</span><span class="mf">1.2019</span><span class="p">,</span><span class="o">-</span><span class="mf">1.20764</span><span class="p">],</span>\
+                  <span class="p">[</span><span class="mf">3.79245</span><span class="p">,</span><span class="mf">1.18385</span><span class="p">,</span><span class="mf">4.90494</span><span class="p">]]</span>
+        <span class="n">a_fin</span> <span class="o">=</span> <span class="n">a_tot</span> <span class="o">+</span> <span class="n">eta</span><span class="o">*</span><span class="p">(</span><span class="n">L_isco</span><span class="p">(</span><span class="n">a_eff</span><span class="p">)</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">a_tot</span><span class="o">*</span><span class="p">(</span><span class="n">E_isco</span><span class="p">(</span><span class="n">a_eff</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">kappas</span><span class="p">)):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">kappas</span><span class="p">[</span><span class="n">i</span><span class="p">])):</span>
+                <span class="n">a_fin</span> <span class="o">+=</span> <span class="n">kappas</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span><span class="o">*</span><span class="n">eta</span><span class="o">**</span><span class="p">(</span><span class="mi">2</span><span class="o">+</span><span class="n">i</span><span class="p">)</span><span class="o">*</span><span class="n">a_eff</span><span class="o">**</span><span class="n">j</span>
+
+    <span class="k">elif</span> <span class="n">method</span><span class="o">==</span><span class="mi">3</span><span class="p">:</span>
+        <span class="c1">## reproduces https://arxiv.org/abs/1508.07250</span>
+        <span class="n">a_tot</span> <span class="o">=</span> <span class="p">(</span><span class="n">spin1</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span><span class="o">+</span><span class="n">spin2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">gamma</span><span class="p">)</span><span class="o">*</span><span class="n">q</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">q</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+        <span class="n">kappas</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">2</span><span class="o">*</span><span class="mi">3</span><span class="o">**</span><span class="mf">0.5</span><span class="p">,</span><span class="o">-</span><span class="mf">0.085</span><span class="p">,</span><span class="mf">0.102</span><span class="p">,</span><span class="o">-</span><span class="mf">1.355</span><span class="p">,</span><span class="o">-</span><span class="mf">0.868</span><span class="p">],</span>\
+                  <span class="p">[</span><span class="o">-</span><span class="mf">4.399</span><span class="p">,</span><span class="o">-</span><span class="mf">5.837</span><span class="p">,</span><span class="o">-</span><span class="mf">2.097</span><span class="p">,</span><span class="mf">4.109</span><span class="p">,</span><span class="mf">2.064</span><span class="p">],</span>\
+                  <span class="p">[</span><span class="mf">9.397</span><span class="p">],[</span><span class="o">-</span><span class="mf">13.181</span><span class="p">]]</span>
+        <span class="n">a_fin</span> <span class="o">=</span> <span class="n">a_tot</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">kappas</span><span class="p">)):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">kappas</span><span class="p">[</span><span class="n">i</span><span class="p">])):</span>
+                <span class="n">a_fin</span> <span class="o">+=</span> <span class="n">kappas</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span><span class="o">*</span><span class="n">eta</span><span class="o">**</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">i</span><span class="p">)</span><span class="o">*</span><span class="n">a_tot</span><span class="o">**</span><span class="n">j</span>
+
+    <span class="k">elif</span> <span class="n">method</span><span class="o">==</span><span class="mi">4</span><span class="p">:</span>
+        <span class="c1">## reproduces https://arxiv.org/abs/0807.2985</span>
+        <span class="n">m0</span> <span class="o">=</span> <span class="mf">0.9515</span>
+        <span class="n">m1</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.013</span>
+        <span class="n">s0</span> <span class="o">=</span> <span class="mf">0.686</span>
+        <span class="n">s1</span> <span class="o">=</span> <span class="mf">0.15</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">s1</span><span class="o">**</span><span class="mf">0.5</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">s1</span><span class="o">**</span><span class="mf">0.5</span><span class="p">)</span>
+        <span class="n">g1</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">c</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="p">(</span><span class="n">q</span><span class="o">+</span><span class="n">c</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+        <span class="n">g2</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">c</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">q</span><span class="o">+</span><span class="n">c</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="mf">1.26</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="mf">0.008</span>
+        <span class="n">a_fin</span> <span class="o">=</span> <span class="n">s0</span><span class="o">*</span><span class="p">(</span><span class="mi">4</span><span class="o">*</span><span class="n">w</span><span class="o">*</span><span class="n">eta</span><span class="o">+</span><span class="mi">16</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">w</span><span class="p">)</span><span class="o">*</span><span class="n">eta</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">+</span><span class="n">s1</span><span class="o">*</span><span class="p">(</span><span class="n">g1</span><span class="o">*</span><span class="n">spin1</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span><span class="o">+</span>\
+                <span class="n">g2</span><span class="o">*</span><span class="n">spin2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">gamma</span><span class="p">))</span><span class="o">+</span><span class="mi">16</span><span class="o">*</span><span class="n">k</span><span class="o">*</span><span class="n">eta</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">spin1</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span><span class="o">+</span>\
+                                                <span class="n">spin2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">gamma</span><span class="p">))</span><span class="o">**</span><span class="mi">2</span>
+
+    <span class="k">return</span> <span class="n">a_fin</span></div>
+
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">fishergw</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">fishergw</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, Costantino Pacilio.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 4.1.2</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
