@@ -3,7 +3,7 @@ import sympy as sp
 from sympy import Rational
 from copy import deepcopy
 from scipy.interpolate import interp1d
-from ..cosmology.redshift_distance import redshift_from_distance
+from ..cosmology import redshift_from_distance
 from ..constants import speed_of_light, solar_mass, G, Mpc
 
 cc = speed_of_light
@@ -30,13 +30,11 @@ class CompactObject():
         **Lamda** *(float)* -- Dimensionless tidal deformability.
         
         **kappa** *(float)* -- Dimensionless spin-induced quadrupole moment.
+        
+        **radius** *(float)* -- Radius [m].
     """
-    # Notes
-    # -----
-    # This class is under development. To do list:
-    # -- support equations of state for neutron stars.
     
-    def __init__(self, mass, spin, Lamda=0.0, kappa=1.0):
+    def __init__(self, mass, spin, Lamda=0.0, kappa=1.0, radius=None):
         """
         :param mass: Mass [:math:`M_\odot`].
         :type mass: float    
@@ -50,11 +48,24 @@ class CompactObject():
         :param kappa: Dimensionless spin-induced quadrupole moment. Defaults to the black hole value.
         :type kappa: float, default=1.0
 
+        :param radius: Radius of the compact object [m]. If ``None``, defaults to the ISCO radius of a Schwarzschild black hole with the same mass.
+        :type radius: float
+
         """
         self.mass = mass
         self.spin = spin
         self.kappa = kappa
         self.Lamda = Lamda
+        if not radius:
+            self.radius = 6*self.mass*rsun 
+        else:
+            self.radius = radius
+
+    def __repr__(self):
+        out = 'CompactObject\n'
+        for k,v in self.__dict__.items():
+            out += '\t%s:\t%.2f\n'%(k,v)
+        return out
 
 
 def _amplitude_coefficients_():
@@ -78,7 +89,7 @@ def _amplitude_coefficients_():
     
     xi = (Rational(1614569,64512) - 1873643*eta/16128 + 2167*eta**2/42)*chi_a**2 + \
          (31*pi/12 - 7*pi*eta/3)*chi_s +\
-         (Rational(1614569,64512) - 61392*eta/1344 + 57451*eta**2/4032)*chi_s**2 +\
+         (Rational(1614569,64512) - 61391*eta/1344 + 57451*eta**2/4032)*chi_s**2 +\
          (31*pi/12 + (Rational(1614569,32256) - 165961*eta/2688)*chi_s)*delta*chi_a
     
     ## output
@@ -106,7 +117,7 @@ def _phase_coefficients_():
 
     .. note::
         
-       The 3.5PN spin-induced term neglects the quadrupole and octupole moment corrections from Eq. (0.5c) in https://arxiv.org/pdf/1701.06318.pdf. Quadrupole corrections are instead included in the 2PN and 3PN terms, as per Eq.s (0.5a-b). 
+       The 3.5PN spin-induced term neglects the quadrupole and octupole moment corrections from Eq. (0.5c) in https://arxiv.org/abs/1701.06318. Quadrupole corrections are instead included in the 2PN and 3PN terms, as per Eq.s (0.5a-b). 
     """
     ## numerical factors
     pi = sp.pi
@@ -157,12 +168,11 @@ def _phase_coefficients_():
     ## leading SS
     out.append(Rational(15293365,508032) + 27145*eta/504 + 3085*eta**2/72 + sigma)     
     out.append((38645*pi/756 - 65*pi*eta/9 + gamma)*(1+3*sp.log(v)))
-    #out.append((38645*pi/756 + 15*pi*eta/9 + gamma)*(1+3*sp.log(v)))
     out.append(Rational(11583231236531,4694215680) - 6848*gE/21 -\
         640*pi**2/3 + (2255*pi**2/12 - Rational(15737765635,3048192))*eta +\
         76055*eta**2/1728 - 127825*eta**3/1296 + xi - Rational(6848,63)*sp.log(64*v**3))
-    out.append( 77096675*pi/254016 + 378515*pi/1512*eta\
-        -74045*pi/756*eta**2 + zeta )
+    out.append(77096675*pi/254016 + 378515*pi/1512*eta\
+        -74045*pi/756*eta**2 + zeta)
     return out
 
 
@@ -201,14 +211,14 @@ class TaylorF2():
 
         **delta_Lambda** *(float)* -- Auxiliary tidal parameter, according to Eq. (15) in https://arxiv.org/abs/1410.8866.
     
-        **keys** *(list)*-- Independent variables w.r.t. which the Fisher matrix is evaluated. Defaults ``['t_c','phi_c','M_c','eta','chi_s','chi_a']``. If ``Lambda_T`` is not zero, ``['Lamda_T','delta_Lamda']`` are added to keys.
+        **keys** *(list)*-- Independent variables w.r.t. which the Fisher matrix is evaluated. Default ``['t_c','phi_c','M_c','eta','chi_s','chi_a','Lamda_T','delta_Lamda']``.
 
     .. note::
     
        Because the TaylorF2 phase is linear in ``t_c`` and ``phi_c``, the actual values of ``t_c`` and ``phi_c`` are irrelevant to the computation of the Fisher matrix and can be left to their default.
     .. note::
 
-       TaylorF2 assumes that the normalization of Eq. (7.177) in [1], without the angular factor Q.
+       TaylorF2 assumes that the normalization of Eq. (7.177) in [1], without the angular factor Q. The angular factor is taken into account when loading the sensitivity curve by Fisher instances.
     
     References:
     
@@ -216,34 +226,33 @@ class TaylorF2():
     """
 
     def __init__(self,obj1,obj2,d_L=100.0,t_c=0.0,phi_c=0.0,redshift=False,PN_phase=3.5):
-        """
-        
+        """ 
         :param obj1: Primary compact object in the binary.
         :type obj1: :class:`CompactObject`
 
         :param obj2: Secondary compact object in the binary.
         :type obj2: :class:`CompactObject`
 
-        :param d_L: Luminosity distance [Mpc].
-        :type d_L: float, default=100.0
+        :param d_L: Luminosity distance [Mpc]. Default: 100.
+        :type d_L: float
 
-        :param t_c: Time of coalescence.
-        :type t_c: float, default=0.0
+        :param t_c: Time of coalescence. Defaut: 0.
+        :type t_c: float
 
-        :param phi_c: Phase of coalescence.
-        :type phi_c: float, default=0.0
+        :param phi_c: Phase of coalescence. Default: 0.
+        :type phi_c: float
 
-        :param redshift: If ``True``, the masses are redshifted, otherwise the redshift is neglected.
-        :type redshift: bool, default=False
+        :param redshift: If ``True``, the masses are redshifted, otherwise the redshift is neglected. Default: ``False``.
+        :type redshift: bool, optional
         
-        :param PN_phase: The PN order up to wich the waveform phase is expanded. It does not include tidal terms at 5PN and 6PN orders. They are activated whenever `obj1` or `obj2` have a nonvanishing tidal Love number.
-        :type redshift: (half-)integer, default=3.5
+        :param PN_phase: The PN order up to wich the waveform phase is expanded. It does not include tidal terms at 5PN and 6PN orders. They are always nonvanishing whenever `obj1` or `obj2` have a nonvanishing tidal parameter. Default: 3.5.
+        :type PN_phase: half-integer. 
         """
         if redshift:
             self.redshift = redshift_from_distance(d_L)
         else:
             self.redshift = 0.0
-        self.keys = ['t_c','phi_c','M_c','eta','chi_s','chi_a']
+        self.keys = ['t_c','phi_c','M_c','eta','chi_s','chi_a','Lamda_T','delta_Lamda']
         self.t_c = t_c
         self.phi_c = phi_c
         self.d_L = d_L*Mpc
@@ -255,33 +264,36 @@ class TaylorF2():
         self.q = obj1.mass / obj2.mass
         self.chi_s = 0.5*(obj1.spin +  obj2.spin)
         self.chi_a = 0.5*(obj1.spin - obj2.spin)
-        self.Lamda_T = 8/13*((1+7*self.eta-31*self.eta**2)*(obj1.Lamda+obj2.Lamda)+np.sqrt(1-4*self.eta)*(1+9*self.eta-11*self.eta**2)*(obj1.Lamda-obj2.Lamda))
-        self.delta_Lamda = 0.5*(np.sqrt(1-4*self.eta)*(1-13272/1319*self.eta+8944/1319*self.eta**2)*(obj1.Lamda+obj2.Lamda)+(1-15910/1319*self.eta+32850/1319*self.eta**2+3380/1319*self.eta**3)*(obj1.Lamda-obj2.Lamda))
-        if self.Lamda_T:
-            self._tidal_ = True
-            self.keys += ['Lamda_T','delta_Lamda']
-        else:
-            self._tidal_ = False
+        self.Lamda_T = Lamda_tilde(self.eta,obj1.Lamda,obj2.Lamda)
+        self.delta_Lamda = delta_Lamda(self.eta,obj1.Lamda,obj2.Lamda)
         self._eval_ = False
         self.PN_phase = PN_phase
+        self.contact_radius = (obj1.radius+obj2.radius)*(1+self.redshift)
+
+    def __repr__(self):
+        out = 'TaylorF2\n'
+        for k in self.keys:
+            out += '\t%s:\t%.5f\n'%(k,self.__dict__[k])
+        out += '\tredshift:\t%.5f\n'%self.redshift
+        out += '\tkappa_s:\t%.5f\n'%self.kappa_s
+        out += '\tkappa_a:\t%.5f\n'%self.kappa_a
+        return out
 
     def isco(self,mode='static'):
         """
         Returns the ISCO frequency of the system.
         
-        :param mode: If ``static``, neglects the contribution of the indivudal spins. If 'Kerr', uses the Kerr ISCO with gravitational self-force corrections and test-particle spin corrections from https://arxiv.org/abs/1010.2553. Currently, these are the only supported options.
-        :type mode: str, default='static'
+        :param mode: If ``static``, neglects the contribution of the indivudal spins. If 'Kerr', uses the Kerr ISCO with gravitational self-force corrections and test-particle spin corrections from https://arxiv.org/abs/1010.2553. Currently, these are the only supported options. Default: ``static``.
+        :type mode: str
 
         :rtype: float
         """
-        #Notes
-        #-----
-        #This method is under development. To do list:
-        #-- implement the contact frequency for non-black hole objects.
-        
         if mode == 'static':
             fmax = cc/(self.M*6**1.5*np.pi)
-        if mode == 'Kerr':
+        elif mode == 'contact':
+            fmax = cc*self.M**0.5/(np.pi*self.contact_radius**1.5)
+        elif mode == 'Kerr':
+            ## reproduces https://arxiv.org/abs/1010.2553
             ## compute 0th order expression
             chi1 = self.chi_s + self.chi_a
             chi2 = self.chi_s - self.chi_a
@@ -312,10 +324,9 @@ class TaylorF2():
         """
         Returns the starting frequency given the osbervational time, as per Eq. (2.15) in https://arxiv.org/abs/gr-qc/0411129v2.
         
-        :param  obs_time: The observational time [yr].
-        :type obs_time: float, default=1.0
-
-        
+        :param  obs_time: The observational time [yr]. Default: 1.
+        :type obs_time: float
+ 
         :rtype: float
         """
         fmin = 4.149e-5*(obs_time)**(-3/8)*(self.M_c*1e-6/rsun)**(-5/8)
@@ -344,28 +355,27 @@ class TaylorF2():
         phase = self.phase_eval(f)
         return amplitude*np.exp(1j*phase)
 
-    def _evaluate_Nabla_(self,keys=None,log_scale_keys=[]):
+    def _evaluate_Nabla_(self,keys=None,logscale_keys=None):
         """
         Returns the gradient vector w.r.t. the arguments in ``keys``.
 
         :param keys: Variables w.r.t. which the gradient vector is evaluated. If ``None`` (default), it is set to ``self.keys``.
-        :type keys: list of str or None
+        :type keys: list of str or ``None``, optional
         
-        :param log_scale_keys: Subset of ``keys`` w.r.t. which the derivatives are evaluated in log scale.
-        :type log_scale_keys: list
+        :param logscale_keys: Subset of ``keys`` w.r.t. which the derivatives are evaluated in log scale. Default: ``None``.
+        :type logscale_keys: list or ``None``, optional
         
         :returns: ``keys`` mapped to their derivative estimators.
-        
         :rtype: dict
         """
         Nabla = {}
         if not keys:
             keys = self.keys
         for argument in keys:
-            Nabla[argument] = self._diff_(argument,log_scale_keys)
+            Nabla[argument] = self._diff_(argument,logscale_keys)
         return Nabla
 
-    def _diff_(self,argument,log_scale_keys=[]):
+    def _diff_(self,argument,logscale_keys=None):
         """
         Derivative of the strain w.r.t. to the argument.
 
@@ -373,7 +383,6 @@ class TaylorF2():
         :type argument: str
 
         :returns: Estimator the differential.
-        
         :rtype: lambda function
 
         .. note::
@@ -386,7 +395,7 @@ class TaylorF2():
         ## phase
         ph_diff = self._phase_(PN=self.PN_phase).subs(params)
         ## change some variable in log scale
-        if argument in log_scale_keys:
+        if logscale_keys and argument in logscale_keys:
             ph_diff = ph_diff.subs({argument:'exp(%s)'%argument})
             ph_diff = sp.diff(ph_diff,argument)
             ph_diff = ph_diff.subs({argument:np.log(self.__dict__[argument])})
@@ -424,11 +433,10 @@ class TaylorF2():
 
     def _phase_(self,PN=3.5):
         """
-        Returns a sympy expression for the phase in term of the independent variables in self.keys.
+        Returns a `sympy` expression for the phase in term of the independent variables in ``self.keys``.
         
         The phase is truncated at the specified PN order.
         
-        If ``self.tidal=True``, tidal terms at 5PN and 6PN are also added.
         """
         cfs = _phase_coefficients_()
         ## restrict to PN order
@@ -436,19 +444,16 @@ class TaylorF2():
         for i in range(int(2*PN)+1):
             out += cfs[i]*v**i
         ## add tidal terms
-        if self._tidal_ == True:
-            ## add 5PN term
-            out += -Rational(39,2)*Lamda_T*v**10 
-            ## add 6PN term
-            out += -Rational(3115,64)*Lamda_T*v**12\
-                + Rational(6595,364)*delta*delta_Lamda*v**12
+        ## add 5PN term
+        out += -Rational(39,2)*Lamda_T*v**10 
+        ## add 6PN term
+        out += -Rational(3115,64)*Lamda_T*v**12\
+            + Rational(6595,364)*delta*delta_Lamda*v**12
         ## add normalization
         out *= 3/(128*eta*v**5)
         ## add constant and linear terms in the phase
         ## measure time in seconds
         out += -sp.pi/4 + 2*c*tc/M*v**3 - phic
-        ## measure time in Km
-        #out += -sp.pi/4 + 2*c*tc*(1000.0/c)/M*v**3 - phic
         out = out.subs('v', '(pi*M*f/c)**Rational(1,3)')
         ## change variables
         out = out.subs([('M','M_c/(eta)**Rational(3,5)'),('delta','sqrt(1-4*eta)')])
@@ -457,3 +462,38 @@ class TaylorF2():
                        ('kappa_a',self.__dict__['kappa_a']),\
                        ('kappa_s',self.__dict__['kappa_s'])])
         return out
+
+def Lamda_tilde(eta,l1,l2):
+    """
+    Returns the tidal parameter of a binary compact object from Eq.(14) in https://arxiv.org/pdf/1410.8866.pdf.
+
+    :param eta: symmetric mass ratio of the binary.
+    :type eta: float
+
+    :param l1: dimensionless tidal parameter of the primary component.
+    :type l1: float
+
+    :param l2: dimensionless tidal parameter of the secondary component.
+    :type l2: float
+
+    :rtype: float
+    """
+    return 8/13*((1+7*eta-31*eta**2)*(l1+l2)+np.sqrt(1-4*eta)*(1+9*eta-11*eta**2)*(l1-l2))
+
+def delta_Lamda(eta,l1,l2):
+    """
+    Returns the tidal parameter of a binary compact object from Eq.(15) in https://arxiv.org/pdf/1410.8866.pdf.
+
+    :param eta: symmetric mass ratio of the binary.
+    :type eta: float
+
+    :param l1: dimensionless tidal parameter of the primary component.
+    :type l1: float
+
+    :param l2: dimensionless tidal parameter of the secondary component.
+    :type l2: float
+
+    :rtype: float
+    """
+    return 0.5*(np.sqrt(1-4*eta)*(1-13272/1319*eta+8944/1319*eta**2)*(l1+l2)+(1-15910/1319*eta+32850/1319*eta**2+3380/1319*eta**3)*(l1-l2))
+

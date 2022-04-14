@@ -1,10 +1,13 @@
 **/__pycache__
 **/.ipynb_checkpoints
-fishergw_test.ipynb
-Untitled.ipynb
-/fishergw/taylorf2/waveform_andrea.py
-/fishergw/taylorf2/waveform_old.py
-/fishergw/taylorf2/waveform_bs.py
+/fishergw/taylorf2/waveform_*.py
+/fishergw/ringdown/waveform_*.py
+/fishergw/ringdown/modified_gr.py
+/output/**
+/notebooks/**
+/scripts/**
+/fishergw/detector/S_h_scird*
+ringdown.py
 
 .readthedocs.yaml
 
@@ -18,4 +21,4 @@ Untitled.ipynb
 /*.egg-info
 
 # Documentation folder
-/docs_old/
+/docs/

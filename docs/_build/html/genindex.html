@@ -90,6 +90,7 @@
 <li class="toctree-l1"><a class="reference internal" href="README.html">About</a></li>
 <li class="toctree-l1"><a class="reference internal" href="README.html#installation">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="README.html#usage-of-taylorf2">Usage of taylorf2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="README.html#usage-of-ringdown">Usage of ringdown</a></li>
 <li class="toctree-l1"><a class="reference internal" href="README.html#usage-of-cosmology">Usage of cosmology</a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules.html">fishergw</a></li>
 </ul>
@@ -164,10 +165,14 @@
  <a href="#_"><strong>_</strong></a>
  | <a href="#C"><strong>C</strong></a>
  | <a href="#D"><strong>D</strong></a>
+ | <a href="#E"><strong>E</strong></a>
  | <a href="#F"><strong>F</strong></a>
+ | <a href="#H"><strong>H</strong></a>
  | <a href="#I"><strong>I</strong></a>
  | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
+ | <a href="#N"><strong>N</strong></a>
+ | <a href="#Q"><strong>Q</strong></a>
  | <a href="#R"><strong>R</strong></a>
  | <a href="#S"><strong>S</strong></a>
  | <a href="#T"><strong>T</strong></a>
@@ -176,11 +181,23 @@
 <h2 id="_">_</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="fishergw.taylorf2.html#fishergw.taylorf2.waveform.TaylorF2.__call__">__call__() (fishergw.taylorf2.waveform.TaylorF2 method)</a>
-</li>
-      <li><a href="fishergw.taylorf2.html#fishergw.taylorf2.fisher.Fisher.__init__">__init__() (fishergw.taylorf2.fisher.Fisher method)</a>
+      <li><a href="fishergw.ringdown.html#fishergw.ringdown.waveform.RingdownLM.__call__">__call__() (fishergw.ringdown.waveform.RingdownLM method)</a>
 
       <ul>
+        <li><a href="fishergw.ringdown.html#fishergw.ringdown.waveform.RingdownMultimode.__call__">(fishergw.ringdown.waveform.RingdownMultimode method)</a>
+</li>
+        <li><a href="fishergw.taylorf2.html#fishergw.taylorf2.waveform.TaylorF2.__call__">(fishergw.taylorf2.waveform.TaylorF2 method)</a>
+</li>
+      </ul></li>
+      <li><a href="fishergw.ringdown.html#fishergw.ringdown.fisher.Fisher.__init__">__init__() (fishergw.ringdown.fisher.Fisher method)</a>
+
+      <ul>
+        <li><a href="fishergw.ringdown.html#fishergw.ringdown.waveform.RingdownLM.__init__">(fishergw.ringdown.waveform.RingdownLM method)</a>
+</li>
+        <li><a href="fishergw.ringdown.html#fishergw.ringdown.waveform.RingdownMultimode.__init__">(fishergw.ringdown.waveform.RingdownMultimode method)</a>
+</li>
+        <li><a href="fishergw.taylorf2.html#fishergw.taylorf2.fisher.Fisher.__init__">(fishergw.taylorf2.fisher.Fisher method)</a>
+</li>
         <li><a href="fishergw.taylorf2.html#fishergw.taylorf2.waveform.CompactObject.__init__">(fishergw.taylorf2.waveform.CompactObject method)</a>
 </li>
         <li><a href="fishergw.taylorf2.html#fishergw.taylorf2.waveform.TaylorF2.__init__">(fishergw.taylorf2.waveform.TaylorF2 method)</a>
@@ -194,19 +211,39 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="fishergw.taylorf2.html#fishergw.taylorf2.waveform.CompactObject">CompactObject (class in fishergw.taylorf2.waveform)</a>
 </li>
+      <li><a href="fishergw.ringdown.html#fishergw.ringdown.fisher.Fisher.correlation_matrix">correlation_matrix() (fishergw.ringdown.fisher.Fisher method)</a>
+
+      <ul>
+        <li><a href="fishergw.taylorf2.html#fishergw.taylorf2.fisher.Fisher.correlation_matrix">(fishergw.taylorf2.fisher.Fisher method)</a>
+</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="fishergw.taylorf2.html#fishergw.taylorf2.fisher.Fisher.correlation_matrix">correlation_matrix() (fishergw.taylorf2.fisher.Fisher method)</a>
+      <li><a href="fishergw.ringdown.html#fishergw.ringdown.fisher.Fisher.covariance_matrix">covariance_matrix() (fishergw.ringdown.fisher.Fisher method)</a>
+
+      <ul>
+        <li><a href="fishergw.taylorf2.html#fishergw.taylorf2.fisher.Fisher.covariance_matrix">(fishergw.taylorf2.fisher.Fisher method)</a>
 </li>
-      <li><a href="fishergw.taylorf2.html#fishergw.taylorf2.fisher.Fisher.covariance_matrix">covariance_matrix() (fishergw.taylorf2.fisher.Fisher method)</a>
-</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
 <h2 id="D">D</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="fishergw.cosmology.html#fishergw.cosmology.redshift_distance.distance_from_redshift">distance_from_redshift() (in module fishergw.cosmology.redshift_distance)</a>
+      <li><a href="fishergw.taylorf2.html#fishergw.taylorf2.waveform.delta_Lamda">delta_Lamda() (in module fishergw.taylorf2.waveform)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="fishergw.ringdown.html#fishergw.ringdown.waveform.RingdownLM.diff_">diff_() (fishergw.ringdown.waveform.RingdownLM method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="E">E</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="fishergw.ringdown.html#fishergw.ringdown.utils.E_isco">E_isco() (in module fishergw.ringdown.utils)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -214,22 +251,20 @@
 <h2 id="F">F</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="fishergw.taylorf2.html#fishergw.taylorf2.fisher.Fisher">Fisher (class in fishergw.taylorf2.fisher)</a>
+      <li><a href="fishergw.ringdown.html#fishergw.ringdown.utils.final_mass">final_mass() (in module fishergw.ringdown.utils)</a>
 </li>
-      <li><a href="fishergw.taylorf2.html#fishergw.taylorf2.fisher.Fisher.fisher_matrix">fisher_matrix() (fishergw.taylorf2.fisher.Fisher method)</a>
+      <li><a href="fishergw.ringdown.html#fishergw.ringdown.utils.final_spin">final_spin() (in module fishergw.ringdown.utils)</a>
 </li>
-      <li>
-    fishergw
+      <li><a href="fishergw.ringdown.html#fishergw.ringdown.fisher.Fisher">Fisher (class in fishergw.ringdown.fisher)</a>
 
       <ul>
-        <li><a href="fishergw.html#module-fishergw">module</a>
+        <li><a href="fishergw.taylorf2.html#fishergw.taylorf2.fisher.Fisher">(class in fishergw.taylorf2.fisher)</a>
 </li>
       </ul></li>
-      <li>
-    fishergw.constants
+      <li><a href="fishergw.ringdown.html#fishergw.ringdown.fisher.Fisher.fisher_matrix">fisher_matrix() (fishergw.ringdown.fisher.Fisher method)</a>
 
       <ul>
-        <li><a href="fishergw.html#module-fishergw.constants">module</a>
+        <li><a href="fishergw.taylorf2.html#fishergw.taylorf2.fisher.Fisher.fisher_matrix">(fishergw.taylorf2.fisher.Fisher method)</a>
 </li>
       </ul></li>
       <li>
@@ -239,13 +274,27 @@
         <li><a href="fishergw.cosmology.html#module-fishergw.cosmology">module</a>
 </li>
       </ul></li>
+      <li>
+    fishergw.ringdown.fisher
+
+      <ul>
+        <li><a href="fishergw.ringdown.html#module-fishergw.ringdown.fisher">module</a>
+</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li>
-    fishergw.cosmology.redshift_distance
+    fishergw.ringdown.utils
 
       <ul>
-        <li><a href="fishergw.cosmology.html#module-fishergw.cosmology.redshift_distance">module</a>
+        <li><a href="fishergw.ringdown.html#module-fishergw.ringdown.utils">module</a>
+</li>
+      </ul></li>
+      <li>
+    fishergw.ringdown.waveform
+
+      <ul>
+        <li><a href="fishergw.ringdown.html#module-fishergw.ringdown.waveform">module</a>
 </li>
       </ul></li>
       <li>
@@ -265,13 +314,39 @@
   </ul></td>
 </tr></table>
 
-<h2 id="I">I</h2>
+<h2 id="H">H</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="fishergw.taylorf2.html#fishergw.taylorf2.fisher.Fisher.invert_matrix">invert_matrix() (fishergw.taylorf2.fisher.Fisher method)</a>
+      <li><a href="fishergw.ringdown.html#fishergw.ringdown.waveform.RingdownLM.hc">hc() (fishergw.ringdown.waveform.RingdownLM method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="fishergw.ringdown.html#fishergw.ringdown.waveform.RingdownLM.hp">hp() (fishergw.ringdown.waveform.RingdownLM method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="I">I</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="fishergw.ringdown.html#fishergw.ringdown.fisher.Fisher.invert_matrix">invert_matrix() (fishergw.ringdown.fisher.Fisher static method)</a>
+
+      <ul>
+        <li><a href="fishergw.taylorf2.html#fishergw.taylorf2.fisher.Fisher.invert_matrix">(fishergw.taylorf2.fisher.Fisher static method)</a>
+</li>
+      </ul></li>
+      <li><a href="fishergw.ringdown.html#fishergw.ringdown.utils.invert_qnm_from_f">invert_qnm_from_f() (in module fishergw.ringdown.utils)</a>
+</li>
+      <li><a href="fishergw.ringdown.html#fishergw.ringdown.utils.invert_qnm_from_ff">invert_qnm_from_ff() (in module fishergw.ringdown.utils)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="fishergw.ringdown.html#fishergw.ringdown.utils.invert_qnm_from_ftau">invert_qnm_from_ftau() (in module fishergw.ringdown.utils)</a>
+</li>
+      <li><a href="fishergw.ringdown.html#fishergw.ringdown.utils.invert_qnm_from_tau">invert_qnm_from_tau() (in module fishergw.ringdown.utils)</a>
+</li>
+      <li><a href="fishergw.ringdown.html#fishergw.ringdown.utils.invert_qnm_from_tautau">invert_qnm_from_tautau() (in module fishergw.ringdown.utils)</a>
+</li>
       <li><a href="fishergw.taylorf2.html#fishergw.taylorf2.waveform.TaylorF2.isco">isco() (fishergw.taylorf2.waveform.TaylorF2 method)</a>
 </li>
   </ul></td>
@@ -280,8 +355,18 @@
 <h2 id="L">L</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="fishergw.taylorf2.html#fishergw.taylorf2.fisher.Fisher.load_psd">load_psd() (fishergw.taylorf2.fisher.Fisher method)</a>
+      <li><a href="fishergw.ringdown.html#fishergw.ringdown.utils.L_isco">L_isco() (in module fishergw.ringdown.utils)</a>
 </li>
+      <li><a href="fishergw.taylorf2.html#fishergw.taylorf2.waveform.Lamda_tilde">Lamda_tilde() (in module fishergw.taylorf2.waveform)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="fishergw.ringdown.html#fishergw.ringdown.fisher.Fisher.load_psd">load_psd() (fishergw.ringdown.fisher.Fisher method)</a>
+
+      <ul>
+        <li><a href="fishergw.taylorf2.html#fishergw.taylorf2.fisher.Fisher.load_psd">(fishergw.taylorf2.fisher.Fisher method)</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -292,13 +377,13 @@
     module
 
       <ul>
-        <li><a href="fishergw.html#module-fishergw">fishergw</a>
-</li>
-        <li><a href="fishergw.html#module-fishergw.constants">fishergw.constants</a>
-</li>
         <li><a href="fishergw.cosmology.html#module-fishergw.cosmology">fishergw.cosmology</a>
 </li>
-        <li><a href="fishergw.cosmology.html#module-fishergw.cosmology.redshift_distance">fishergw.cosmology.redshift_distance</a>
+        <li><a href="fishergw.ringdown.html#module-fishergw.ringdown.fisher">fishergw.ringdown.fisher</a>
+</li>
+        <li><a href="fishergw.ringdown.html#module-fishergw.ringdown.utils">fishergw.ringdown.utils</a>
+</li>
+        <li><a href="fishergw.ringdown.html#module-fishergw.ringdown.waveform">fishergw.ringdown.waveform</a>
 </li>
         <li><a href="fishergw.taylorf2.html#module-fishergw.taylorf2.fisher">fishergw.taylorf2.fisher</a>
 </li>
@@ -310,14 +395,38 @@
   </ul></td>
 </tr></table>
 
+<h2 id="N">N</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="fishergw.ringdown.html#fishergw.ringdown.waveform.RingdownLM.Nabla">Nabla() (fishergw.ringdown.waveform.RingdownLM method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="Q">Q</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="fishergw.ringdown.html#fishergw.ringdown.utils.qnm_Kerr">qnm_Kerr() (in module fishergw.ringdown.utils)</a>
+</li>
+  </ul></td>
+</tr></table>
+
 <h2 id="R">R</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="fishergw.ringdown.html#fishergw.ringdown.utils.r_isco">r_isco() (in module fishergw.ringdown.utils)</a>
+</li>
       <li><a href="setup.html#setup.readme">readme() (in module setup)</a>
+</li>
+      <li><a href="fishergw.ringdown.html#fishergw.ringdown.utils.ringdown_absolute_amplitudes">ringdown_absolute_amplitudes() (in module fishergw.ringdown.utils)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="fishergw.cosmology.html#fishergw.cosmology.redshift_distance.redshift_from_distance">redshift_from_distance() (in module fishergw.cosmology.redshift_distance)</a>
+      <li><a href="fishergw.ringdown.html#fishergw.ringdown.utils.ringdown_relative_amplitudes">ringdown_relative_amplitudes() (in module fishergw.ringdown.utils)</a>
+</li>
+      <li><a href="fishergw.ringdown.html#fishergw.ringdown.waveform.RingdownLM">RingdownLM (class in fishergw.ringdown.waveform)</a>
+</li>
+      <li><a href="fishergw.ringdown.html#fishergw.ringdown.waveform.RingdownMultimode">RingdownMultimode (class in fishergw.ringdown.waveform)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -325,6 +434,12 @@
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="fishergw.ringdown.html#fishergw.ringdown.fisher.Fisher.sample">sample() (fishergw.ringdown.fisher.Fisher method)</a>
+
+      <ul>
+        <li><a href="fishergw.taylorf2.html#fishergw.taylorf2.fisher.Fisher.sample">(fishergw.taylorf2.fisher.Fisher method)</a>
+</li>
+      </ul></li>
       <li>
     setup
 
@@ -332,11 +447,23 @@
         <li><a href="setup.html#module-setup">module</a>
 </li>
       </ul></li>
+      <li><a href="fishergw.ringdown.html#fishergw.ringdown.fisher.Fisher.sigma1d">sigma1d() (fishergw.ringdown.fisher.Fisher method)</a>
+
+      <ul>
+        <li><a href="fishergw.taylorf2.html#fishergw.taylorf2.fisher.Fisher.sigma1d">(fishergw.taylorf2.fisher.Fisher method)</a>
+</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="fishergw.taylorf2.html#fishergw.taylorf2.fisher.Fisher.sigma1d">sigma1d() (fishergw.taylorf2.fisher.Fisher method)</a>
+      <li><a href="fishergw.ringdown.html#fishergw.ringdown.fisher.Fisher.snr">snr() (fishergw.ringdown.fisher.Fisher method)</a>
+
+      <ul>
+        <li><a href="fishergw.taylorf2.html#fishergw.taylorf2.fisher.Fisher.snr">(fishergw.taylorf2.fisher.Fisher method)</a>
 </li>
-      <li><a href="fishergw.taylorf2.html#fishergw.taylorf2.fisher.Fisher.snr">snr() (fishergw.taylorf2.fisher.Fisher method)</a>
+      </ul></li>
+      <li><a href="fishergw.ringdown.html#fishergw.ringdown.fisher.Fisher.snr_BCW">snr_BCW() (fishergw.ringdown.fisher.Fisher method)</a>
+</li>
+      <li><a href="fishergw.ringdown.html#fishergw.ringdown.utils.spherical_harmonics">spherical_harmonics() (in module fishergw.ringdown.utils)</a>
 </li>
       <li><a href="fishergw.taylorf2.html#fishergw.taylorf2.waveform.TaylorF2.start_frequency_from_obs_time">start_frequency_from_obs_time() (fishergw.taylorf2.waveform.TaylorF2 method)</a>
 </li>
@@ -362,7 +489,7 @@
 
   <div role="contentinfo">
     <p>
-        &#169; Copyright 2021, Costantino Pacilio.
+        &#169; Copyright 2022, Costantino Pacilio.
 
     </p>
   </div>

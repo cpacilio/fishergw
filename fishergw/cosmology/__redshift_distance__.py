@@ -8,8 +8,7 @@ cc = speed_of_light*1e-3 # Km/s
 def distance_from_redshift(z):
     """
     Returns the luminosity distance [Mpc] from the redshift.
-   
-    Uses the Planck 2018 cosmological parameters from Tab. 1 in https://arxiv.org/abs/1807.06209.
+    Uses cosmological parameters from the constants.py module.
 
     :param float z: Redshift.
 
@@ -24,16 +23,15 @@ def distance_from_redshift(z):
 
 def redshift_from_distance(d_L):
     """
-    Returns the redshift from the luminosity distance [Mpc].
+    Returns the redshift from the luminosity distance [Mpc]. 
+    Uses cosmological parameters from the constants.py module.
 
-    Uses the Planck 2018 cosmological parameters from Tab. 1 in https://arxiv.org/abs/1807.06209.
-
-    :param float d_L: Luminosity distance [Mpc]. Must be no less than 1.
+    :param float d_L: Luminosity distance [Mpc].
     
     :rtype: float
     """
-    if d_L<1:
-        raise ValueError('d_L must be no less than 1 Mpc!')
+    if d_L<=2:
+        return d_L*H0/cc
     f = lambda x: d_L - distance_from_redshift(x)
     z = fsolve(f,10).item()
     return z

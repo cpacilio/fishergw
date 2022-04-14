@@ -2,11 +2,11 @@ import numpy as np
 from scipy.interpolate import interp1d
 import sys
 
-print('\nThis script reproduces the first block of Table 1\n\
-in Arun et al. (2005), https://arxiv.org/abs/gr-qc/0411146\n')
-
-print('NOTE: after the 2PN order, uncertainties in phi_c deviate because of a different\n\
-convention in the definition of the 2.5PN term.')
+print('------------------------------------------------------------------------------------------------.')
+print('Reproduces the first block of Table 1 in Arun et al. (2005), https://arxiv.org/abs/gr-qc/0411146.')
+print('NOTE: after the 2PN order, uncertainties in phi_c deviate \n\
+        because of a different convention in the definition of the 2.5PN term.')
+print('------------------------------------------------------------------------------------------------.')
 
 ## import fishergw objects
 sys.path.append('..')
@@ -24,14 +24,14 @@ def S_h(f):
 ## define a function to compute sigmas without code repetition
 def compute_sigma(signal):
     ## define fisher matrix
-    log_scale_keys = ['M_c','eta']
-    fisher = Fisher(signal,keys=keys,log_scale_keys=log_scale_keys)
+    logscale_keys = ['M_c','eta']
+    fisher = Fisher(signal,keys=keys,logscale_keys=logscale_keys)
     fisher.psd = S_h
     fmin = 20
     fmax = signal.isco(mode='static')
-    fm = fisher.fisher_matrix(fmin,fmax,nbins=int(1e4))
+    fm = fisher.fisher_matrix(fmin,fmax,nbins=1e4)
     ## compute snr
-    snr = fisher.snr(fmin,fmax,nbins=int(1e4))
+    snr = fisher.snr(fmin,fmax,nbins=1e4)
     ## renormalize to snr=10
     rho0 = 10
     fm *= rho0**2/snr**2
@@ -68,7 +68,7 @@ for PN in [1,1.5,2,2.5,3,3.5]:
         string += '%.2E\t'%sigma[k]
     print(string)
 
-## blach hole neutron star case
+## black hole neutron star case
 print('\nNS-BH\n')
 
 ## define intrinsic parameters
@@ -87,7 +87,7 @@ for PN in [1,1.5,2,2.5,3,3.5]:
         string += '%.2E\t'%sigma[k]
     print(string)
 
-## binary black hole star case
+## binary black hole case
 print('\nBH-BH\n')
 
 ## define intrinsic parameters

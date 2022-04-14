@@ -1,1 +1,1 @@
-from .redshift_distance import distance_from_redshift, redshift_from_distance
+from .__redshift_distance__ import distance_from_redshift, redshift_from_distance

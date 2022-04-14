@@ -47,87 +47,103 @@
 <span class="sd">    Attributes:</span>
 <span class="sd">        **signal** (:class:`TaylorF2`) -- A :class:`TaylorF2` waveform instance.</span>
 
-<span class="sd">        **integration_method** (:class:`scipy.integrate`) -- An integration method from the :class:`scipy.integrate` module.</span>
+<span class="sd">        **integration_method** (:class:`scipy.integrate`) -- An integration method from the :class:`scipy.integrate` subpackage.</span>
 
 <span class="sd">        **psd** (:class:`scipy.interpolate.interp1d`) -- Interpolant of the PSD. An instance of :class:`scipy.interpolate.interp1d`.</span>
 
-<span class="sd">        **fmin** *(float)* -- If ``psd_name`` is provided, ``fmin`` is the corresponding minimum frequency. Otherwise, ``fmin = None``.</span>
+<span class="sd">        **fmin** *(float)* -- If ``asd_name`` is provided, ``fmin`` is the corresponding minimum frequency. Otherwise, ``fmin = None``.</span>
 
-<span class="sd">        **fmax** *(float)* -- If ``psd_name`` is provided, ``fmax`` is the corresponding maximum frequency. Otherwise, ``fmax = None``.</span>
+<span class="sd">        **fmax** *(float)* -- If ``asd_name`` is provided, ``fmax`` is the corresponding maximum frequency. Otherwise, ``fmax = None``.</span>
 
-<span class="sd">        **Qavg** *(float)* -- Angle-averaging factor :math:`Q`. When :func:`load_psd` is called, the PSD is divided by :math:`Q^2` to ensure that the SNR and the Fisher matrix elements are angle-averaged.</span>
+<span class="sd">        **Qavg** *(float)* -- Angle-averaging factor :math:`Q`. When :func:`load_asd` is called, the PSD is divided by :math:`Q^2` to ensure that the SNR and the Fisher matrix elements are angle-averaged.</span>
 <span class="sd">    </span>
 <span class="sd">        **keys** *(list)* -- Independent variables w.r.t. which the Fisher matrix is evaluated.</span>
 
-<span class="sd">        **_detectors_** *(dict)* -- Dictionary mapping built-in detectors to their ``psd_name`` and angle-averaging factor :math:`Q`. Built-in detectors are Advanced Ligo (&#39;aLigo&#39;), Cosmic Explorer (&#39;CE&#39;), Einstein Telescope (&#39;ET&#39;) and LISA (&#39;lisa&#39;). The following conventions hold for :math:`Q`:</span>
+<span class="sd">        **_detectors_** *(dict)* -- Dictionary mapping built-in detectors to their ``asd_name`` and angle-averaging factor :math:`Q`. Built-in detectors are Advanced Ligo (``&#39;aligo&#39;``), Cosmic Explorer (``&#39;ce&#39;``), Einstein Telescope (``&#39;etd&#39;``) and LISA (``&#39;lisa&#39;``). The following conventions hold for :math:`Q`:</span>
 <span class="sd">        </span>
-<span class="sd">            &#39;aLigo&#39; and &#39;CE&#39; are mapped to the factor :math:`Q=2/5` for a two-armed 90-degrees detector (see, e.g., Eq. (7.177) in [1]);</span>
+<span class="sd">            ``&#39;aligo&#39;`` and ``&#39;ce&#39;`` are mapped to the factor :math:`Q=2/5` for a two-armed 90-degrees detector (see, e.g., Eq. (7.177) in [1]);</span>
 <span class="sd">        </span>
-<span class="sd">            &#39;ET&#39; is mapped to :math:`Q=2/5\sqrt{3/2}`, the additional factor :math:`\sqrt{3/2}` coming from the fact that ET is a three-armed 60-degrees detector with two channels (see Eq. (4) in https://arxiv.org/abs/1012.0908);</span>
+<span class="sd">            ``&#39;etd&#39;`` is mapped to :math:`Q=2/5*\sqrt{3/2}`, the additional factor :math:`\sqrt{3/2}` coming from the fact that ET is a three-armed 60-degrees detector with two channels (see Eq. (4) in https://arxiv.org/abs/1012.0908);</span>
 <span class="sd">        </span>
-<span class="sd">            &#39;lisa&#39; is mapped to :math:`Q=2/\sqrt{5}`. This only accounts for averaging over the inclination angle, because the LISA sensitivity curve is already averaged over orientation and detector channels (see Eq.s (2,8-9) in https://arxiv.org/abs/1803.01944).</span>
+<span class="sd">            ``&#39;lisa&#39;`` is mapped to :math:`Q=2/\sqrt{5}`. This only accounts for averaging over the inclination angle, because the LISA sensitivity curve is already averaged over orientation and detector channels (see Eq.s (2,8-9) in https://arxiv.org/abs/1803.01944).</span>
 
 <span class="sd">References:</span>
 
 <span class="sd">    [1] Maggiore, Michele. Gravitational waves: Volume 1: Theory and experiments. Vol. 1. Oxford university press, 2008.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">_detectors_</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;aLigo&#39;</span><span class="p">:(</span><span class="n">dir_path</span><span class="o">+</span><span class="s1">&#39;/../detector/aligo_psd.dat&#39;</span><span class="p">,</span><span class="mi">2</span><span class="o">/</span><span class="mi">5</span><span class="p">),</span>\
-                 <span class="s1">&#39;CE&#39;</span><span class="p">:(</span><span class="n">dir_path</span><span class="o">+</span><span class="s1">&#39;/../detector/ce_psd.dat&#39;</span><span class="p">,</span><span class="mi">2</span><span class="o">/</span><span class="mi">5</span><span class="p">),</span>\
-                 <span class="s1">&#39;ET&#39;</span><span class="p">:(</span><span class="n">dir_path</span><span class="o">+</span><span class="s1">&#39;/../detector/etd_psd.dat&#39;</span><span class="p">,</span><span class="mi">2</span><span class="o">/</span><span class="mi">5</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">3</span><span class="o">/</span><span class="mi">2</span><span class="p">)),</span>\
-                 <span class="s1">&#39;lisa&#39;</span><span class="p">:(</span><span class="n">dir_path</span><span class="o">+</span><span class="s1">&#39;/../detector/lisa_psd.dat&#39;</span><span class="p">,</span><span class="mi">2</span><span class="o">/</span><span class="mi">5</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">5</span><span class="p">))}</span>
+    <span class="n">_detectors_</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;aligo&#39;</span><span class="p">:(</span><span class="s1">&#39;aligo_asd.txt&#39;</span><span class="p">,</span><span class="mi">2</span><span class="o">/</span><span class="mi">5</span><span class="p">),</span>\
+                 <span class="s1">&#39;ce&#39;</span><span class="p">:(</span><span class="s1">&#39;ce_asd.txt&#39;</span><span class="p">,</span><span class="mi">2</span><span class="o">/</span><span class="mi">5</span><span class="p">),</span>\
+                 <span class="s1">&#39;etd&#39;</span><span class="p">:(</span><span class="s1">&#39;etd_asd.txt&#39;</span><span class="p">,</span><span class="mi">2</span><span class="o">/</span><span class="mi">5</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">3</span><span class="o">/</span><span class="mi">2</span><span class="p">)),</span>\
+                 <span class="s1">&#39;lisa&#39;</span><span class="p">:(</span><span class="s1">&#39;lisa_asd.txt&#39;</span><span class="p">,</span><span class="mi">2</span><span class="o">/</span><span class="mi">5</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">5</span><span class="p">))}</span>
     
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">signal</span><span class="p">,</span><span class="n">integration_method</span><span class="o">=</span><span class="n">simps</span><span class="p">,</span>\
-            <span class="n">psd_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">detector</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">keys</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">log_scale_keys</span><span class="o">=</span><span class="p">[]):</span>
+<div class="viewcode-block" id="Fisher.__init__"><a class="viewcode-back" href="../../../fishergw.taylorf2.html#fishergw.taylorf2.fisher.Fisher.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">signal</span><span class="p">,</span><span class="n">integration_method</span><span class="o">=</span><span class="n">simps</span><span class="p">,</span>\
+            <span class="n">asd_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">detector</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">keys</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">logscale_keys</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param signal: A :class:`TaylorF2` waveform instance</span>
 <span class="sd">        :type signal: :class:`TaylorF2`</span>
 
-<span class="sd">        :param integration_method: The integration method to compute the SNR and the Gisher matrix elements.</span>
+<span class="sd">        :param integration_method: The integration method to compute the SNR and the Fisher matrix elements.</span>
 <span class="sd">        :type integration_method: :class:`scipy.integrate` object, default= :class:`scipy.integrate.simps`</span>
 
-<span class="sd">        :param psd_name: The path to a text file with the tabulated PSD. If ``None``, psd defaults to 1.0. If ``detector`` is not ``None``, ``psd_name`` is read from the ``_detectors_`` dictionary</span>
-<span class="sd">        :type psd_name: filepath or None, optional</span>
+<span class="sd">        :param asd_name: The path to a text file with the tabulated ASD. If ``None``, the ASD defaults to 1.0. If ``detector`` is not ``None``, ``asd_name`` is read from the ``_detectors_`` internal dictionary</span>
+<span class="sd">        :type asd_name: filepath or None, optional</span>
 <span class="sd">            </span>
-<span class="sd">        :param detector: If not ``None``, must be one of ``[&#39;aLigo&#39;,&#39;CE&#39;,&#39;ET&#39;,&#39;lisa&#39;]``.</span>
+<span class="sd">        :param detector: If not ``None``, must be one of ``[&#39;aligo&#39;,&#39;ce&#39;,&#39;etd&#39;,&#39;lisa&#39;]``.</span>
 <span class="sd">        :type detector: str or None, optional</span>
 
 <span class="sd">        :param keys: Independent variables w.r.t. which the Fisher matrix is evaluated. If ``None``, defaults to ``self.signal.keys``.</span>
 <span class="sd">        :type keys: list of str or None</span>
 <span class="sd">        </span>
-<span class="sd">        :param log_scale_keys: Subset of ``keys`` to be converted in log scale when computing the Fisher. Defaults to the empty list.</span>
-<span class="sd">        :type log_scale_keys: list</span>
+<span class="sd">        :param logscale_keys: Subset of ``keys`` to be converted in log scale when computing the Fisher. Default: None.</span>
+<span class="sd">        :type logscale_keys: list or ``None``, optional</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">signal</span> <span class="o">=</span> <span class="n">signal</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">keys</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">keys</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">signal</span><span class="o">.</span><span class="n">keys</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">keys</span> <span class="o">=</span> <span class="n">keys</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">log_scale_keys</span> <span class="o">=</span> <span class="n">log_scale_keys</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logscale_keys</span> <span class="o">=</span> <span class="n">logscale_keys</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">integration_method</span> <span class="o">=</span> <span class="n">simps</span>
         <span class="k">if</span> <span class="n">detector</span><span class="p">:</span>
-            <span class="n">psd_name</span><span class="p">,</span> <span class="n">Qavg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_detectors_</span><span class="p">[</span><span class="n">detector</span><span class="p">]</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">load_psd</span><span class="p">(</span><span class="n">psd_name</span><span class="p">,</span><span class="n">Qavg</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">psd_name</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">Qavg</span> <span class="o">=</span> <span class="mf">1.0</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">load_psd</span><span class="p">(</span><span class="n">psd_name</span><span class="p">)</span>
+            <span class="n">asd_name</span><span class="p">,</span> <span class="n">Qavg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_detectors_</span><span class="p">[</span><span class="n">detector</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">load_psd</span><span class="p">(</span><span class="n">asd_name</span><span class="p">,</span><span class="n">Qavg</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">asd_name</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">load_psd</span><span class="p">(</span><span class="n">asd_name</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">Qavg</span> <span class="o">=</span> <span class="mf">1.0</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">psd</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="mf">1.0</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">fmin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fmax</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
-        
-<div class="viewcode-block" id="Fisher.snr"><a class="viewcode-back" href="../../../fishergw.taylorf2.html#fishergw.taylorf2.fisher.Fisher.snr">[docs]</a>    <span class="k">def</span> <span class="nf">snr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">fmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">fmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">nbins</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="mf">1e5</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">asd_name</span> <span class="o">=</span> <span class="s1">&#39;flat=1.0&#39;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fmin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fmax</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span></div>
+    
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;Fisher</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">keys: &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+        <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">PSD:</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t\t</span><span class="s1">name: </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">asd_name</span>
+        <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t\t</span><span class="s1">Qavg: &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Qavg</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t\t</span><span class="s1">fmin: </span><span class="si">%.2f</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">fmin</span>
+            <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t\t</span><span class="s1">fmax: </span><span class="si">%.2f</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">%</span><span class="bp">self</span><span class="o">.</span><span class="n">fmax</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\t\t</span><span class="s1">fmin and fmax are None</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="k">return</span> <span class="n">out</span>
+
+<div class="viewcode-block" id="Fisher.snr"><a class="viewcode-back" href="../../../fishergw.taylorf2.html#fishergw.taylorf2.fisher.Fisher.snr">[docs]</a>    <span class="k">def</span> <span class="nf">snr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">fmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">fmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">nbins</span><span class="o">=</span><span class="mf">1e5</span><span class="p">,</span><span class="n">logspace</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the SNR of the signal.</span>
 
-<span class="sd">        :param fmin: Minimum frequency. If ``None``, defaults to the minimum frequency set by the provided PSD file.</span>
+<span class="sd">        :param fmin: Minimum frequency. If ``None``, defaults to the minimum frequency set by the provided ASD file.</span>
 <span class="sd">        :type fmin: float or None, optional</span>
 
-<span class="sd">        :param fmax: Maximum frequency. If ``None``, defaults to the maximum frequency set by the provided PSD file.</span>
+<span class="sd">        :param fmax: Maximum frequency. If ``None``, defaults to the maximum frequency set by the provided ASD file.</span>
 <span class="sd">        :type fmax: float or None, optional</span>
 
-<span class="sd">        :param nbins: Binning of the integration domain.</span>
-<span class="sd">        :type nbins: int, default=1e5</span>
+<span class="sd">        :param nbins: Binning of the integration domain. Defaults to 1e5.</span>
+<span class="sd">        :type nbins: float</span>
+
+<span class="sd">        :param logspace: If ``True``, integration is performed in logspace over frequencies. Default: ``False``.</span>
+<span class="sd">        :type logspace: bool</span>
 
 <span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -135,51 +151,76 @@
             <span class="n">fmin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fmin</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">fmax</span><span class="p">:</span>
             <span class="n">fmax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fmax</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">fmin</span><span class="p">,</span><span class="n">fmax</span><span class="p">,</span><span class="nb">int</span><span class="p">(</span><span class="n">nbins</span><span class="p">))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">logspace</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">fmin</span><span class="p">,</span><span class="n">fmax</span><span class="p">,</span><span class="nb">int</span><span class="p">(</span><span class="n">nbins</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">fmin</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">fmax</span><span class="p">),</span><span class="nb">int</span><span class="p">(</span><span class="n">nbins</span><span class="p">))</span>
         <span class="n">y</span> <span class="o">=</span> <span class="mi">4</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="n">x</span><span class="p">))</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">psd</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="n">snr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">integration_method</span><span class="p">(</span><span class="n">y</span><span class="p">,</span><span class="n">x</span><span class="p">)</span>
         <span class="n">snr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">snr</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">snr</span></div>
     
-<div class="viewcode-block" id="Fisher.load_psd"><a class="viewcode-back" href="../../../fishergw.taylorf2.html#fishergw.taylorf2.fisher.Fisher.load_psd">[docs]</a>    <span class="k">def</span> <span class="nf">load_psd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">psd_name</span><span class="p">,</span><span class="n">Qavg</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
+<div class="viewcode-block" id="Fisher.load_psd"><a class="viewcode-back" href="../../../fishergw.taylorf2.html#fishergw.taylorf2.fisher.Fisher.load_psd">[docs]</a>    <span class="k">def</span> <span class="nf">load_psd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">asd_name</span><span class="p">,</span><span class="n">Qavg</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span><span class="n">logspace</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Loads the PSD from a text file. Initializes the attributes ``psd``, ``fmin``, ``fmax`` and ``Qavg``.</span>
 
-<span class="sd">        :param psd_name: Path to the PSD text file.</span>
-<span class="sd">        :type psd_name: filepath</span>
+<span class="sd">        :param asd_name: name of the text file containing the ASD table. The file will be first looked into the ``fishergw/detector/`` folder, then into the ``fishergw/detector/unofficial_asd/`` folder. Otherwise, ``asd_name`` must be the full path of the text file.</span>
+<span class="sd">        :type asd_name: str</span>
 
-<span class="sd">        :param Qavg: Value of the angle-averaging factor. See the description in the :class:`Fisher` attributes.</span>
-<span class="sd">        :type Qavg: float, default=1.0</span>
-
-<span class="sd">        :returns: self instance</span>
-<span class="sd">        :rtype: :class:`Fisher`</span>
+<span class="sd">        :param Qavg: Value of the angle-averaging factor. See the description in the :class:`Fisher` attributes. Default: 1.</span>
+<span class="sd">        :type Qavg: float</span>
+<span class="sd">        </span>
+<span class="sd">        :param logspace: If ``True``, the ASD is interpolated in logspace along the y-axis. Default: ``False``.</span>
+<span class="sd">        :type logspace: bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">genfromtxt</span><span class="p">(</span><span class="n">psd_name</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">dir_path</span><span class="o">+</span><span class="s1">&#39;/../detector/&#39;</span><span class="o">+</span><span class="n">asd_name</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">asd_name</span> <span class="o">=</span> <span class="s1">&#39;fishergw/detector/&#39;</span><span class="o">+</span><span class="n">asd_name</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">dir_path</span><span class="o">+</span><span class="s1">&#39;/../detector/unofficial_asd/&#39;</span><span class="o">+</span><span class="n">asd_name</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">asd_name</span> <span class="o">=</span> <span class="s1">&#39;fishergw/detector/unofficial_asd/&#39;</span><span class="o">+</span><span class="n">asd_name</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">asd_name</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">asd_name</span> <span class="o">=</span> <span class="n">asd_name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">Qavg</span> <span class="o">=</span> <span class="n">Qavg</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fmin</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fmax</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">psd</span> <span class="o">=</span> <span class="n">interp1d</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">s</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="n">Qavg</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span><span class="n">kind</span><span class="o">=</span><span class="s1">&#39;cubic&#39;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span></div>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">logspace</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">psd</span> <span class="o">=</span> <span class="n">interp1d</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">s</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="n">Qavg</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span><span class="n">kind</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span>\
+                                <span class="c1">#bounds_error=False,fill_value=1e10,\</span>
+                                <span class="c1">#fill_value=&#39;extrapolate&#39;,\</span>
+                               <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">psd</span> <span class="o">=</span> <span class="n">interp1d</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span><span class="n">kind</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span>\
+                              <span class="c1">#bounds_error=False,fill_value=5,\</span>
+                              <span class="c1">#fill_value=&#39;extrapolate&#39;,\</span>
+                          <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">psd</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="mi">10</span><span class="o">**</span><span class="n">psd</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">/</span><span class="n">Qavg</span><span class="o">**</span><span class="mi">2</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
     
-<div class="viewcode-block" id="Fisher.fisher_matrix"><a class="viewcode-back" href="../../../fishergw.taylorf2.html#fishergw.taylorf2.fisher.Fisher.fisher_matrix">[docs]</a>    <span class="k">def</span> <span class="nf">fisher_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">fmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">fmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">nbins</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="mf">1e5</span><span class="p">),</span><span class="n">priors</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Fisher.fisher_matrix"><a class="viewcode-back" href="../../../fishergw.taylorf2.html#fishergw.taylorf2.fisher.Fisher.fisher_matrix">[docs]</a>    <span class="k">def</span> <span class="nf">fisher_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">fmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">fmax</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">nbins</span><span class="o">=</span><span class="mf">1e5</span><span class="p">,</span><span class="n">priors</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>\
+                      <span class="n">logspace</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the Fisher matrix. Gaussian priors can be specified based on https://arxiv.org/abs/gr-qc/9502040.</span>
 <span class="sd">        </span>
 <span class="sd">        :param fmin: Minimum frequency. If ``None``, defaults to the minimum frequency set by the provided PSD file.</span>
-<span class="sd">        :type fmax: float or None, optional</span>
+<span class="sd">        :type fmin: float or None, optional</span>
 
 <span class="sd">        :param fmax: Maximum frequency. If ``None``, defaults to the maximum frequency set by the provided PSD file.</span>
 <span class="sd">        :type fmax: float or None, optional</span>
 
-<span class="sd">        :param nbins: Binning of the integration domain.</span>
-<span class="sd">        :type nbins: int, default=1e5</span>
+<span class="sd">        :param nbins: Binning of the integration domain. Defaults to 1e5.</span>
+<span class="sd">        :type nbins: float</span>
 <span class="sd">        </span>
-<span class="sd">        :param priors: Dictionary mapping a key with the standard deviation of its Gaussian prior. Defaults to None.</span>
+<span class="sd">        :param priors: Dictionary mapping each variable name with the standard deviation of its Gaussian prior. Defaults to ``None``.</span>
 <span class="sd">        :type priors: dict or None</span>
 
 <span class="sd">        :rtype: :class:`numpy.array`, shape ``(len(keys),len(keys))``</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">Nabla</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">signal</span><span class="o">.</span><span class="n">_evaluate_Nabla_</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">,</span><span class="n">log_scale_keys</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">log_scale_keys</span><span class="p">)</span>
+<span class="sd">        </span>
+<span class="sd">        :param logspace: If ``True``, integrations are performed in logspace over frequencies. Default: ``False``.</span>
+<span class="sd">        :type logspace: Bool        &quot;&quot;&quot;</span>
+        <span class="n">Nabla</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">signal</span><span class="o">.</span><span class="n">_evaluate_Nabla_</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">,</span><span class="n">logscale_keys</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logscale_keys</span><span class="p">)</span>
         <span class="n">dim</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">fmin</span><span class="p">:</span>
             <span class="n">fmin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fmin</span>
@@ -187,7 +228,10 @@
             <span class="n">fmax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fmax</span>
         <span class="n">fm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">dim</span><span class="p">,</span><span class="n">dim</span><span class="p">))</span>
         <span class="n">derivatives</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">Nabla</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
-        <span class="n">f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">fmin</span><span class="p">,</span><span class="n">fmax</span><span class="p">,</span><span class="nb">int</span><span class="p">(</span><span class="n">nbins</span><span class="p">))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">logspace</span><span class="p">:</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">fmin</span><span class="p">,</span><span class="n">fmax</span><span class="p">,</span><span class="nb">int</span><span class="p">(</span><span class="n">nbins</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">fmin</span><span class="p">),</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">fmax</span><span class="p">),</span><span class="nb">int</span><span class="p">(</span><span class="n">nbins</span><span class="p">))</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">dim</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">dim</span><span class="p">):</span>
                 <span class="n">y</span> <span class="o">=</span> <span class="mi">4</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">real</span><span class="p">(</span><span class="n">derivatives</span><span class="p">[</span><span class="n">i</span><span class="p">](</span><span class="n">f</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">derivatives</span><span class="p">[</span><span class="n">j</span><span class="p">](</span><span class="n">f</span><span class="p">)))</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">psd</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
@@ -204,85 +248,106 @@
                     <span class="c1">#warnings.warn(warning_message)</span>
         <span class="k">return</span> <span class="n">fm</span></div>
     
-<div class="viewcode-block" id="Fisher.invert_matrix"><a class="viewcode-back" href="../../../fishergw.taylorf2.html#fishergw.taylorf2.fisher.Fisher.invert_matrix">[docs]</a>    <span class="k">def</span> <span class="nf">invert_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">fm</span><span class="p">,</span><span class="n">tol</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">):</span>
+<div class="viewcode-block" id="Fisher.invert_matrix"><a class="viewcode-back" href="../../../fishergw.taylorf2.html#fishergw.taylorf2.fisher.Fisher.invert_matrix">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">invert_matrix</span><span class="p">(</span><span class="n">matrix</span><span class="p">,</span><span class="n">svd</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span><span class="n">tol</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns the inverse of the \Fisher matrix. A singular value decomposition is applied and directions with singular values smaller than ``tol`` are discarded.</span>
+<span class="sd">        Returns the inverse of the a matrix.</span>
 
-<span class="sd">        :param fm: The \Fisher matrix.</span>
-<span class="sd">        :type fm: :class:`numpy.array`, shape ``(len(keys),len(keys))``</span>
+<span class="sd">        :param matrix: The input matrix.</span>
+<span class="sd">        :type matrix: :class:`numpy.array`</span>
+
+<span class="sd">        :param svd: If ``True`` a singular value decomposition is applied and principal directions with singular values smaller than ``tol`` are discarded. Default: ``False``.</span>
+<span class="sd">        :param svd: bool, optional</span>
 
 <span class="sd">        :param tol: Directions with singular values smaller than ``tol`` are discarded when inverting the matrix. Default: 1e-6.</span>
 <span class="sd">        :type tol: float</span>
 
-<span class="sd">        :rtype: :class:`numpy.array`, shape ``(len(keys),len(keys))``        </span>
+<span class="sd">        :rtype: :class:`numpy.array`       </span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">dim</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">fm</span><span class="p">)</span>
-        <span class="n">diag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">fm</span><span class="p">[</span><span class="nb">range</span><span class="p">(</span><span class="n">dim</span><span class="p">),</span><span class="nb">range</span><span class="p">(</span><span class="n">dim</span><span class="p">)])</span>
-        <span class="n">norm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">diag</span><span class="p">,</span><span class="n">diag</span><span class="p">)</span>
-        <span class="n">fm_normalized</span> <span class="o">=</span> <span class="n">fm</span><span class="o">/</span><span class="n">norm</span>
-        <span class="n">u</span><span class="p">,</span><span class="n">s</span><span class="p">,</span><span class="n">vh</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">svd</span><span class="p">(</span><span class="n">fm_normalized</span><span class="p">)</span>
-        <span class="n">idx</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">s</span><span class="o">&lt;</span><span class="n">tol</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">idx</span><span class="p">:</span>
-            <span class="n">s</span><span class="p">[</span><span class="o">-</span><span class="n">idx</span><span class="p">:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>
-        <span class="n">inverse_fm_normalized</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">vh</span><span class="o">.</span><span class="n">T</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">s</span><span class="p">),</span><span class="n">u</span><span class="o">.</span><span class="n">T</span><span class="p">))</span>
-        <span class="n">inverse_fm</span> <span class="o">=</span> <span class="n">inverse_fm_normalized</span><span class="o">/</span><span class="n">norm</span>
-        <span class="k">return</span> <span class="n">inverse_fm</span></div>
+        <span class="n">dim</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">matrix</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">svd</span><span class="p">:</span>
+            <span class="n">inverse_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">matrix</span><span class="p">(</span><span class="n">matrix</span><span class="p">)</span><span class="o">.</span><span class="n">I</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">diag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">matrix</span><span class="p">[</span><span class="nb">range</span><span class="p">(</span><span class="n">dim</span><span class="p">),</span><span class="nb">range</span><span class="p">(</span><span class="n">dim</span><span class="p">)])</span>
+            <span class="n">norm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="n">diag</span><span class="p">,</span><span class="n">diag</span><span class="p">)</span>
+            <span class="n">matix_normalized</span> <span class="o">=</span> <span class="n">matrix</span><span class="o">/</span><span class="n">norm</span>
+            <span class="n">u</span><span class="p">,</span><span class="n">s</span><span class="p">,</span><span class="n">vh</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">svd</span><span class="p">(</span><span class="n">matrix_normalized</span><span class="p">)</span>
+            <span class="n">idx</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">s</span><span class="o">/</span><span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">&lt;</span><span class="n">tol</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">idx</span><span class="p">:</span>
+                <span class="n">s</span><span class="p">[</span><span class="o">-</span><span class="n">idx</span><span class="p">:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+            <span class="n">inverse_matrix_normalized</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">vh</span><span class="o">.</span><span class="n">T</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">s</span><span class="p">),</span><span class="n">u</span><span class="o">.</span><span class="n">T</span><span class="p">))</span>
+            <span class="n">inverse_matrix</span> <span class="o">=</span> <span class="n">inverse_matrix_normalized</span><span class="o">/</span><span class="n">norm</span>
+        <span class="k">return</span> <span class="n">inverse_matrix</span></div>
     
-<div class="viewcode-block" id="Fisher.covariance_matrix"><a class="viewcode-back" href="../../../fishergw.taylorf2.html#fishergw.taylorf2.fisher.Fisher.covariance_matrix">[docs]</a>    <span class="k">def</span> <span class="nf">covariance_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">fm</span><span class="p">,</span><span class="n">svd</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="Fisher.covariance_matrix"><a class="viewcode-back" href="../../../fishergw.taylorf2.html#fishergw.taylorf2.fisher.Fisher.covariance_matrix">[docs]</a>    <span class="k">def</span> <span class="nf">covariance_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">fm</span><span class="p">,</span><span class="n">svd</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns the covariance matrix. If `svd`, the Fisher matrix is inverted with a singular value decomposition.</span>
+<span class="sd">        Returns the covariance matrix. If ``svd``, the Fisher matrix is inverted with a singular value decomposition.</span>
 
 <span class="sd">        :param fm: The \Fisher matrix.</span>
-<span class="sd">        :type fm: :class:`numpy.array`, shape ``(len(keys),len(keys))``</span>
+<span class="sd">        :type fm: :class:`numpy.array`, shape ``(len(self.keys),len(self.keys))``</span>
 
-<span class="sd">        :rtype: :class:`numpy.array`, shape ``(len(keys),len(keys))``</span>
+<span class="sd">        :rtype: :class:`numpy.array`, shape ``(len(self.keys),len(self.keys))``</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">svd</span><span class="p">:</span>
-            <span class="n">inverse_fm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">invert_matrix</span><span class="p">(</span><span class="n">fm</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">inverse_fm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">matrix</span><span class="p">(</span><span class="n">fm</span><span class="p">)</span><span class="o">.</span><span class="n">I</span>
-        <span class="k">return</span> <span class="n">inverse_fm</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">invert_matrix</span><span class="p">(</span><span class="n">fm</span><span class="p">,</span><span class="n">svd</span><span class="p">)</span></div>
     
-<div class="viewcode-block" id="Fisher.correlation_matrix"><a class="viewcode-back" href="../../../fishergw.taylorf2.html#fishergw.taylorf2.fisher.Fisher.correlation_matrix">[docs]</a>    <span class="k">def</span> <span class="nf">correlation_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">fm</span><span class="p">,</span><span class="n">svd</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="Fisher.correlation_matrix"><a class="viewcode-back" href="../../../fishergw.taylorf2.html#fishergw.taylorf2.fisher.Fisher.correlation_matrix">[docs]</a>    <span class="k">def</span> <span class="nf">correlation_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">fm</span><span class="p">,</span><span class="n">svd</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns the correlation matrix. If `svd`, the Fisher matrix is inverted with a singular value decomposition.</span>
+<span class="sd">        Returns the correlation matrix. If ``svd``, the Fisher matrix is inverted with a singular value decomposition.</span>
 
 <span class="sd">        :param fm: The \Fisher matrix.</span>
-<span class="sd">        :type fm: :class:`numpy.array`, shape ``(len(keys),len(keys))``</span>
+<span class="sd">        :type fm: :class:`numpy.array`, shape ``(len(self.keys),len(self.keys))``</span>
 
-<span class="sd">        :rtype: :class:`numpy.array`, shape ``(len(keys),len(keys))``</span>
+<span class="sd">        :rtype: :class:`numpy.array`, shape ``(len(self.keys),len(self.keys))``</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">svd</span><span class="p">:</span>
-            <span class="n">inverse_fm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">invert_matrix</span><span class="p">(</span><span class="n">fm</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">inverse_fm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">matrix</span><span class="p">(</span><span class="n">fm</span><span class="p">)</span><span class="o">.</span><span class="n">I</span>
+        <span class="n">inverse_fm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">invert_matrix</span><span class="p">(</span><span class="n">fm</span><span class="p">,</span><span class="n">svd</span><span class="p">)</span>
         <span class="n">corr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">inverse_fm</span><span class="p">)</span>
         <span class="n">dim</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">fm</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">dim</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">dim</span><span class="p">):</span>
                 <span class="n">corr</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">inverse_fm</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">inverse_fm</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">inverse_fm</span><span class="p">[</span><span class="n">j</span><span class="p">,</span><span class="n">j</span><span class="p">])</span>
                 <span class="n">corr</span><span class="p">[</span><span class="n">j</span><span class="p">,</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">corr</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span>
-        <span class="c1">#sigma = {self.keys[i]:np.sqrt(inverse_fm[i,i]) for i in range(dim)}</span>
         <span class="k">return</span> <span class="n">corr</span></div>
     
-<div class="viewcode-block" id="Fisher.sigma1d"><a class="viewcode-back" href="../../../fishergw.taylorf2.html#fishergw.taylorf2.fisher.Fisher.sigma1d">[docs]</a>    <span class="k">def</span> <span class="nf">sigma1d</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">fm</span><span class="p">,</span><span class="n">svd</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<div class="viewcode-block" id="Fisher.sigma1d"><a class="viewcode-back" href="../../../fishergw.taylorf2.html#fishergw.taylorf2.fisher.Fisher.sigma1d">[docs]</a>    <span class="k">def</span> <span class="nf">sigma1d</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">fm</span><span class="p">,</span><span class="n">svd</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns the standard deviations of the 1D marginalized posteriors. If `svd`, the Fisher matrix is inverted with a singular value decomposition.</span>
-
+<span class="sd">        Returns the standard deviations of the 1D marginalized posteriors. If ``svd``, the Fisher matrix is inverted with a singular value decomposition.</span>
 
 <span class="sd">        :param fm: The \Fisher matrix.</span>
-<span class="sd">        :type fm: :class:`numpy.array`, shape ``(len(keys),len(keys))``</span>
+<span class="sd">        :type fm: :class:`numpy.array`, shape ``(len(self.keys),len(self.keys))``</span>
 
-<span class="sd">        :returns: Dictionary mapping ``keys`` to the corresponding standard deviations.</span>
+<span class="sd">        :returns: Dictionary mapping ``self.keys`` to the corresponding standard deviations.</span>
 <span class="sd">        :rtype: dict</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">svd</span><span class="p">:</span>
-            <span class="n">inverse_fm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">invert_matrix</span><span class="p">(</span><span class="n">fm</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">inverse_fm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">matrix</span><span class="p">(</span><span class="n">fm</span><span class="p">)</span><span class="o">.</span><span class="n">I</span>
+        <span class="n">inverse_fm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">invert_matrix</span><span class="p">(</span><span class="n">fm</span><span class="p">,</span><span class="n">svd</span><span class="p">)</span>
         <span class="n">dim</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">fm</span><span class="p">)</span>
         <span class="n">sigma</span> <span class="o">=</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">inverse_fm</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">dim</span><span class="p">)}</span>
-        <span class="k">return</span> <span class="n">sigma</span></div></div>
+        <span class="k">return</span> <span class="n">sigma</span></div>
+
+<div class="viewcode-block" id="Fisher.sample"><a class="viewcode-back" href="../../../fishergw.taylorf2.html#fishergw.taylorf2.fisher.Fisher.sample">[docs]</a>    <span class="k">def</span> <span class="nf">sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">covariance_matrix</span><span class="p">,</span><span class="n">nsamples</span><span class="o">=</span><span class="mf">1e4</span><span class="p">,</span><span class="n">keys</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns sampled parameters from the posterior distribution given by the `covariance matrix`.</span>
+
+<span class="sd">        :param covariance_matrix: The covariance matrix determining the likelihood.</span>
+<span class="sd">        :type covariance_matrix: :class:`numpy.array`, shape ``(len(keys),len(keys))``</span>
+
+<span class="sd">        :param nsamples: Number of samples to draw. Defaults: 1e4.</span>
+<span class="sd">        :type nsamples: float</span>
+
+<span class="sd">        :param keys: List of variable names to sample. It must be a subset of ``self.keys``. If ``None``, defaults to ``self.keys``.</span>
+<span class="sd">        :type keys: list.</span>
+
+<span class="sd">        :rtype: :class:`numpy.array`, shape ``(len(keys),nsamples)``.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">comp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">signal</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">keys</span><span class="p">:</span>
+            <span class="n">keys</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span>
+            <span class="n">cov</span> <span class="o">=</span> <span class="n">covariance_matrix</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">idx</span> <span class="o">=</span> <span class="p">[</span><span class="n">comp</span><span class="o">.</span><span class="n">keys</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">]</span>
+            <span class="n">cov</span> <span class="o">=</span> <span class="n">covariance_matrix</span><span class="p">[</span><span class="n">idx</span><span class="p">][:,</span><span class="n">idx</span><span class="p">]</span>
+        <span class="n">means</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">comp</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">])</span>
+        <span class="n">samples</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">(</span><span class="n">means</span><span class="p">,</span><span class="n">cov</span><span class="p">,</span><span class="nb">int</span><span class="p">(</span><span class="n">nsamples</span><span class="p">))</span><span class="o">.</span><span class="n">T</span>
+        <span class="k">return</span> <span class="n">samples</span></div></div>
 
 </pre></div>
 
@@ -304,10 +369,6 @@
 <h3>Navigation</h3>
 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../README.html">About</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../README.html#installation">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../README.html#usage-of-taylorf2">Usage of taylorf2</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../README.html#usage-of-cosmology">Usage of cosmology</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../modules.html">fishergw</a></li>
 </ul>
 
@@ -343,7 +404,7 @@
       <div class="clearer"></div>
     </div>
     <div class="footer">
-      &copy;2021, Costantino Pacilio.
+      &copy;2022, Costantino Pacilio.
       
       |
       Powered by <a href="http://sphinx-doc.org/">Sphinx 4.1.2</a>
