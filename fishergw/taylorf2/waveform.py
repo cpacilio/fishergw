@@ -264,8 +264,8 @@ class TaylorF2():
         self.q = obj1.mass / obj2.mass
         self.chi_s = 0.5*(obj1.spin +  obj2.spin)
         self.chi_a = 0.5*(obj1.spin - obj2.spin)
-        self.Lamda_T = Lamda_tilde(self.eta,obj1.Lamda,obj2.Lamda)
-        self.delta_Lamda = delta_Lamda(self.eta,obj1.Lamda,obj2.Lamda)
+        self.Lamda_T = lamda_tilde(self.eta,obj1.Lamda,obj2.Lamda)
+        self.delta_Lamda = delta_lamda(self.eta,obj1.Lamda,obj2.Lamda)
         self._eval_ = False
         self.PN_phase = PN_phase
         self.contact_radius = (obj1.radius+obj2.radius)*(1+self.redshift)
@@ -463,7 +463,7 @@ class TaylorF2():
                        ('kappa_s',self.__dict__['kappa_s'])])
         return out
 
-def Lamda_tilde(eta,l1,l2):
+def lamda_tilde(eta,l1,l2):
     """
     Returns the tidal parameter of a binary compact object from Eq.(14) in https://arxiv.org/pdf/1410.8866.pdf.
 
@@ -480,7 +480,7 @@ def Lamda_tilde(eta,l1,l2):
     """
     return 8/13*((1+7*eta-31*eta**2)*(l1+l2)+np.sqrt(1-4*eta)*(1+9*eta-11*eta**2)*(l1-l2))
 
-def delta_Lamda(eta,l1,l2):
+def delta_lamda(eta,l1,l2):
     """
     Returns the tidal parameter of a binary compact object from Eq.(15) in https://arxiv.org/pdf/1410.8866.pdf.
 

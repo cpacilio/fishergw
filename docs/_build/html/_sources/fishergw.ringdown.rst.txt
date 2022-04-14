@@ -12,6 +12,14 @@ fishergw.ringdown.fisher module
    :undoc-members:
    :show-inheritance:
 
+fishergw.ringdown.harmonics module
+----------------------------------
+
+.. automodule:: fishergw.ringdown.harmonics
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 fishergw.ringdown.utils module
 ------------------------------
 

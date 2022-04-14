@@ -89,6 +89,11 @@
             
               <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="README.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="README.html#installation">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="README.html#usage-of-taylorf2">Usage of taylorf2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="README.html#usage-of-ringdown">Usage of ringdown</a></li>
+<li class="toctree-l1"><a class="reference internal" href="README.html#usage-of-cosmology">Usage of cosmology</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="modules.html">fishergw</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="fishergw.html">fishergw package</a><ul class="current">
 <li class="toctree-l3 current"><a class="reference internal" href="fishergw.html#subpackages">Subpackages</a><ul class="current">
@@ -97,6 +102,8 @@
 <li class="toctree-l4 current"><a class="current reference internal" href="#">fishergw.taylorf2 package</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="fishergw.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="fishergw.html#module-fishergw.constants">fishergw.constants module</a></li>
 </ul>
 </li>
 </ul>
@@ -395,24 +402,6 @@
 
 </dd></dl>
 
-<dl class="py function">
-<dt class="sig sig-object py" id="fishergw.taylorf2.waveform.Lamda_tilde">
-<span class="sig-prename descclassname"><span class="pre">fishergw.taylorf2.waveform.</span></span><span class="sig-name descname"><span class="pre">Lamda_tilde</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fishergw/taylorf2/waveform.html#Lamda_tilde"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fishergw.taylorf2.waveform.Lamda_tilde" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns the tidal parameter of a binary compact object from Eq.(14) in <a class="reference external" href="https://arxiv.org/pdf/1410.8866.pdf">https://arxiv.org/pdf/1410.8866.pdf</a>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>eta</strong> (<em>float</em>) – symmetric mass ratio of the binary.</p></li>
-<li><p><strong>l1</strong> (<em>float</em>) – dimensionless tidal parameter of the primary component.</p></li>
-<li><p><strong>l2</strong> (<em>float</em>) – dimensionless tidal parameter of the secondary component.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>float</p>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="py class">
 <dt class="sig sig-object py" id="fishergw.taylorf2.waveform.TaylorF2">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">fishergw.taylorf2.waveform.</span></span><span class="sig-name descname"><span class="pre">TaylorF2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d_L</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">t_c</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi_c</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">redshift</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PN_phase</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3.5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fishergw/taylorf2/waveform.html#TaylorF2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fishergw.taylorf2.waveform.TaylorF2" title="Permalink to this definition">¶</a></dt>
@@ -512,9 +501,27 @@
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="fishergw.taylorf2.waveform.delta_Lamda">
-<span class="sig-prename descclassname"><span class="pre">fishergw.taylorf2.waveform.</span></span><span class="sig-name descname"><span class="pre">delta_Lamda</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fishergw/taylorf2/waveform.html#delta_Lamda"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fishergw.taylorf2.waveform.delta_Lamda" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="fishergw.taylorf2.waveform.delta_lamda">
+<span class="sig-prename descclassname"><span class="pre">fishergw.taylorf2.waveform.</span></span><span class="sig-name descname"><span class="pre">delta_lamda</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fishergw/taylorf2/waveform.html#delta_lamda"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fishergw.taylorf2.waveform.delta_lamda" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the tidal parameter of a binary compact object from Eq.(15) in <a class="reference external" href="https://arxiv.org/pdf/1410.8866.pdf">https://arxiv.org/pdf/1410.8866.pdf</a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>eta</strong> (<em>float</em>) – symmetric mass ratio of the binary.</p></li>
+<li><p><strong>l1</strong> (<em>float</em>) – dimensionless tidal parameter of the primary component.</p></li>
+<li><p><strong>l2</strong> (<em>float</em>) – dimensionless tidal parameter of the secondary component.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="fishergw.taylorf2.waveform.lamda_tilde">
+<span class="sig-prename descclassname"><span class="pre">fishergw.taylorf2.waveform.</span></span><span class="sig-name descname"><span class="pre">lamda_tilde</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/fishergw/taylorf2/waveform.html#lamda_tilde"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#fishergw.taylorf2.waveform.lamda_tilde" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the tidal parameter of a binary compact object from Eq.(14) in <a class="reference external" href="https://arxiv.org/pdf/1410.8866.pdf">https://arxiv.org/pdf/1410.8866.pdf</a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">

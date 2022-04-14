@@ -1,10 +1,13 @@
 fishergw.cosmology package
 ==========================
 
-Module contents
----------------
+Submodules
+----------
 
-.. automodule:: fishergw.cosmology
+fishergw.cosmology.utils module
+-------------------------------
+
+.. automodule:: fishergw.cosmology.utils
    :members:
    :undoc-members:
    :show-inheritance:
