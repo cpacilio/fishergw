@@ -1,15 +1,5 @@
 **/__pycache__
 **/.ipynb_checkpoints
-<<<<<<< HEAD
-fishergw_test.ipynb
-Untitled.ipynb
-/fishergw/taylorf2/waveform_andrea.py
-/fishergw/taylorf2/waveform_*.py
-/fishergw/detector/S_h_scird*
-/notebooks/
-/output/
-/scripts/
-=======
 /fishergw/taylorf2/waveform_*.py
 /fishergw/ringdown/waveform_*.py
 /fishergw/ringdown/modified_gr.py
@@ -18,7 +8,6 @@ Untitled.ipynb
 /scripts/**
 /fishergw/detector/S_h_scird*
 ringdown.py
->>>>>>> ringdown
 
 .readthedocs.yaml
 
