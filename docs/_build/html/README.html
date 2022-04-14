@@ -92,6 +92,7 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">About</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#installation">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#usage-of-taylorf2">Usage of taylorf2</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#usage-of-ringdown">Usage of ringdown</a></li>
 <li class="toctree-l1"><a class="reference internal" href="#usage-of-cosmology">Usage of cosmology</a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules.html">fishergw</a></li>
 </ul>
@@ -165,7 +166,6 @@
 <h1>About<a class="headerlink" href="#about" title="Permalink to this headline">¶</a></h1>
 <p>A Python package to compute Fisher matrices for gravitational wave models</p>
 <p><a class="reference external" href="https://fishergw.readthedocs.io/en/latest/">Documentation</a></p>
-<p><a class="reference external" href="https://github.com/cpacilio/fishergw">GitHub Source</a></p>
 </div>
 <div class="section" id="installation">
 <h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
@@ -180,27 +180,65 @@
 </div>
 <div class="section" id="usage-of-taylorf2">
 <h1>Usage of taylorf2<a class="headerlink" href="#usage-of-taylorf2" title="Permalink to this headline">¶</a></h1>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">fishergw.taylorf2</span> <span class="kn">import</span> <span class="n">CompactObject</span><span class="p">,</span> <span class="n">TaylorF2</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">fishergw.taylorf2</span> <span class="kn">import</span> <span class="n">Fisher</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">fishergw.taylorf2</span> <span class="kn">import</span> <span class="n">CompactObject</span><span class="p">,</span> <span class="n">TaylorF2</span><span class="p">,</span> <span class="n">Fisher</span>
 <span class="go">&gt;&gt;&gt;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">m1</span><span class="p">,</span> <span class="n">m2</span> <span class="o">=</span> <span class="mf">1.46</span><span class="p">,</span> <span class="mf">1.27</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">DL</span> <span class="o">=</span> <span class="mi">40</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">s1</span><span class="p">,</span> <span class="n">s2</span> <span class="o">=</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">obj1</span> <span class="o">=</span> <span class="n">CompactObject</span><span class="p">(</span><span class="n">m1</span><span class="p">,</span><span class="n">s1</span><span class="p">,</span><span class="n">Lamda</span><span class="o">=</span><span class="mi">199</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">obj2</span> <span class="o">=</span> <span class="n">CompactObject</span><span class="p">(</span><span class="n">m2</span><span class="p">,</span><span class="n">s2</span><span class="p">,</span><span class="n">Lamda</span><span class="o">=</span><span class="mi">474</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">signal</span> <span class="o">=</span> <span class="n">TaylorF2</span><span class="p">(</span><span class="n">obj1</span><span class="p">,</span><span class="n">obj2</span><span class="p">,</span><span class="n">DL</span><span class="o">=</span><span class="n">DL</span><span class="p">,</span><span class="n">redshift</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mass_1</span><span class="p">,</span> <span class="n">mass_2</span> <span class="o">=</span> <span class="mf">1.6</span><span class="p">,</span> <span class="mf">1.4</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">luminosity_distance</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">spin_1</span><span class="p">,</span> <span class="n">spin_2</span> <span class="o">=</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lamda_1</span><span class="p">,</span> <span class="n">lamda_2</span> <span class="o">=</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">350</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">obj1</span> <span class="o">=</span> <span class="n">CompactObject</span><span class="p">(</span><span class="n">mass_1</span><span class="p">,</span><span class="n">spin_1</span><span class="p">,</span><span class="n">Lamda</span><span class="o">=</span><span class="n">lamda_1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">obj2</span> <span class="o">=</span> <span class="n">CompactObject</span><span class="p">(</span><span class="n">mass_2</span><span class="p">,</span><span class="n">spin_2</span><span class="p">,</span><span class="n">Lamda</span><span class="o">=</span><span class="n">lamda_2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">signal</span> <span class="o">=</span> <span class="n">TaylorF2</span><span class="p">(</span><span class="n">obj1</span><span class="p">,</span><span class="n">obj2</span><span class="p">,</span><span class="n">d_L</span><span class="o">=</span><span class="n">luminosity_distance</span><span class="p">,</span><span class="n">redshift</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="go">&gt;&gt;&gt;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;t_c&#39;</span><span class="p">,</span><span class="s1">&#39;phi_c&#39;</span><span class="p">,</span><span class="s1">&#39;M_c&#39;</span><span class="p">,</span><span class="s1">&#39;eta&#39;</span><span class="p">,</span><span class="s1">&#39;Lamda_T&#39;</span><span class="p">,</span><span class="s1">&#39;delta_Lamda&#39;</span><span class="p">,</span><span class="s1">&#39;chi_s&#39;</span><span class="p">,</span><span class="s1">&#39;chi_a&#39;</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">fisher</span> <span class="o">=</span> <span class="n">Fisher</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span><span class="n">detector</span><span class="o">=</span><span class="s1">&#39;ET&#39;</span><span class="p">,</span><span class="n">keys</span><span class="o">=</span><span class="n">keys</span><span class="p">,</span>\
-<span class="gp">&gt;&gt;&gt; </span>        <span class="n">keys</span><span class="o">=</span><span class="n">keys</span><span class="p">,</span><span class="n">log_scale_keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;M_c&#39;</span><span class="p">,</span><span class="s1">&#39;eta&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">keys</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;t_c&#39;</span><span class="p">,</span><span class="s1">&#39;phi_c&#39;</span><span class="p">,</span><span class="s1">&#39;M_c&#39;</span><span class="p">,</span><span class="s1">&#39;eta&#39;</span><span class="p">,</span><span class="s1">&#39;Lamda_T&#39;</span><span class="p">,</span><span class="s1">&#39;chi_s&#39;</span><span class="p">,</span><span class="s1">&#39;chi_a&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">logscale_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;M_c&#39;</span><span class="p">,</span><span class="s1">&#39;eta&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fisher</span> <span class="o">=</span> <span class="n">Fisher</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span><span class="n">detector</span><span class="o">=</span><span class="s1">&#39;etd&#39;</span><span class="p">,</span>\
+<span class="gp">&gt;&gt;&gt; </span>        <span class="n">keys</span><span class="o">=</span><span class="n">keys</span><span class="p">,</span><span class="n">logscale_keys</span><span class="o">=</span><span class="n">logscale_keys</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">fmin</span> <span class="o">=</span> <span class="mi">5</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">fmax</span> <span class="o">=</span> <span class="n">signal</span><span class="o">.</span><span class="n">isco</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;static&#39;</span><span class="p">)</span>
 <span class="go">&gt;&gt;&gt;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">snr</span> <span class="o">=</span> <span class="n">fisher</span><span class="o">.</span><span class="n">snr</span><span class="p">(</span><span class="n">fmin</span><span class="p">,</span><span class="n">fmax</span><span class="p">,</span><span class="n">nbins</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="mf">1e5</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">snr</span> <span class="o">=</span> <span class="n">fisher</span><span class="o">.</span><span class="n">snr</span><span class="p">(</span><span class="n">fmin</span><span class="p">,</span><span class="n">fmax</span><span class="p">,</span><span class="n">nbins</span><span class="o">=</span><span class="mf">1e5</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">priors</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;chi_s&#39;</span><span class="p">:</span><span class="mf">0.05</span><span class="p">,</span><span class="s1">&#39;chi_a&#39;</span><span class="p">:</span><span class="mf">0.05</span><span class="p">}</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">fm</span> <span class="o">=</span> <span class="n">fisher</span><span class="o">.</span><span class="n">fisher_matrix</span><span class="p">(</span><span class="n">fmin</span><span class="p">,</span><span class="n">fmax</span><span class="p">,</span><span class="n">nbins</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="mf">1e5</span><span class="p">),</span><span class="n">priors</span><span class="o">=</span><span class="n">priors</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">cov</span> <span class="o">=</span> <span class="n">fisher</span><span class="o">.</span><span class="n">covariance_matrix</span><span class="p">(</span><span class="n">fm</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">sigma</span> <span class="o">=</span> <span class="n">fisher</span><span class="o">.</span><span class="n">sigma1d</span><span class="p">(</span><span class="n">fm</span><span class="p">,</span><span class="n">svd</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fisher_matrix</span> <span class="o">=</span> <span class="n">fisher</span><span class="o">.</span><span class="n">fisher_matrix</span><span class="p">(</span><span class="n">fmin</span><span class="p">,</span><span class="n">fmax</span><span class="p">,</span><span class="n">nbins</span><span class="o">=</span><span class="mf">1e5</span><span class="p">,</span><span class="n">priors</span><span class="o">=</span><span class="n">priors</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">covariance_matrix</span> <span class="o">=</span> <span class="n">fisher</span><span class="o">.</span><span class="n">covariance_matrix</span><span class="p">(</span><span class="n">fisher_matrix</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">correlation_matrix</span> <span class="o">=</span> <span class="n">fisher</span><span class="o">.</span><span class="n">correlation_matrix</span><span class="p">(</span><span class="n">fisher_matrix</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sigmas</span> <span class="o">=</span> <span class="n">fisher</span><span class="o">.</span><span class="n">sigma1d</span><span class="p">(</span><span class="n">fisher_matrix</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">samples</span> <span class="o">=</span> <span class="n">fisher</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">covariance_matrix</span><span class="p">,</span><span class="n">nsamples</span><span class="o">=</span><span class="mf">1e5</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="usage-of-ringdown">
+<h1>Usage of ringdown<a class="headerlink" href="#usage-of-ringdown" title="Permalink to this headline">¶</a></h1>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">fishergw.ringdown</span> <span class="kn">import</span> <span class="n">RingdownMultimode</span><span class="p">,</span> <span class="n">Fisher</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">fishergw.ringdown.utils</span> <span class="kn">import</span> <span class="n">qnm_Kerr</span><span class="p">,</span> <span class="n">final_mass</span><span class="p">,</span> <span class="n">final_spin</span><span class="p">,</span>\
+<span class="gp">&gt;&gt;&gt; </span>    <span class="n">ringdown_absolute_amplitudes</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">fishergw.cosmology</span> <span class="kn">import</span> <span class="n">redshift_from_distance</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mass_1_source</span><span class="p">,</span> <span class="n">mass_2_source</span> <span class="o">=</span> <span class="mi">36</span><span class="p">,</span> <span class="mi">30</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">spin_1</span><span class="p">,</span> <span class="n">spin_2</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mass_f_source</span> <span class="o">=</span> <span class="n">final_mass</span><span class="p">(</span><span class="n">mass_1_source</span><span class="p">,</span><span class="n">mass_2_source</span><span class="p">,</span><span class="n">spin_1</span><span class="p">,</span><span class="n">spin_2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">spin_f</span> <span class="o">=</span> <span class="n">final_spin</span><span class="p">(</span><span class="n">mass_1_source</span><span class="p">,</span><span class="n">mass_2_source</span><span class="p">,</span><span class="n">spin_1</span><span class="p">,</span><span class="n">spin_2</span><span class="p">)</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">luminosity_distance</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">redshift</span> <span class="o">=</span> <span class="n">redshift_from_distance</span><span class="p">(</span><span class="n">luminosity_distance</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">mass_f</span> <span class="o">=</span> <span class="n">mass_f_source</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">redshift</span><span class="p">)</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">modes</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">),(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="p">)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">freqs</span><span class="p">,</span> <span class="n">taus</span><span class="p">,</span> <span class="n">amps</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">mode</span> <span class="ow">in</span> <span class="n">modes</span><span class="p">:</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="n">f</span><span class="p">,</span><span class="n">tau</span> <span class="o">=</span> <span class="n">qnm_Kerr</span><span class="p">(</span><span class="n">mass_f</span><span class="p">,</span><span class="n">spin_f</span><span class="p">,</span><span class="n">mode</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="n">freqs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="n">taus</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tau</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="n">amps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ringdown_absolute_amplitude</span><span class="p">(</span><span class="n">mass_f</span><span class="p">,</span><span class="n">mass_1_source</span><span class="o">/</span><span class="n">mass_2_source</span><span class="p">,</span>\
+<span class="gp">&gt;&gt;&gt; </span>        <span class="n">spin_1</span><span class="p">,</span><span class="n">spin_2</span><span class="p">,</span><span class="n">luminosity_distance</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">phis</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">modes</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">signal</span> <span class="o">=</span> <span class="n">RingdownMultimode</span><span class="p">(</span><span class="n">modes</span><span class="p">,</span><span class="n">freqs</span><span class="p">,</span><span class="n">taus</span><span class="p">,</span><span class="n">amps</span><span class="p">,</span><span class="n">phis</span><span class="p">)</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fisher</span> <span class="o">=</span> <span class="n">Fisher</span><span class="p">(</span><span class="n">signal</span><span class="p">,</span><span class="n">detector</span><span class="o">=</span><span class="s1">&#39;etd&#39;</span><span class="p">)</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">snr</span> <span class="o">=</span> <span class="n">fisher</span><span class="o">.</span><span class="n">snr</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fisher_matrix</span> <span class="o">=</span> <span class="n">fisher</span><span class="o">.</span><span class="n">fisher_matrix</span><span class="p">(</span><span class="n">nbins</span><span class="o">=</span><span class="mf">1e5</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sigmas</span> <span class="o">=</span> <span class="n">fisher</span><span class="o">.</span><span class="n">sigma1d</span><span class="p">(</span><span class="n">fisher_matrix</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -208,7 +246,7 @@
 <h1>Usage of cosmology<a class="headerlink" href="#usage-of-cosmology" title="Permalink to this headline">¶</a></h1>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">fishergw.cosmology</span> <span class="kn">import</span> <span class="n">redshift_from_distance</span><span class="p">,</span> <span class="n">distance_from_redshift</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">z</span> <span class="o">=</span> <span class="n">redshift_from_distance</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">d</span> <span class="o">=</span> <span class="n">distance_from_redshift</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">d_L</span> <span class="o">=</span> <span class="n">distance_from_redshift</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -227,7 +265,7 @@
 
   <div role="contentinfo">
     <p>
-        &#169; Copyright 2021, Costantino Pacilio.
+        &#169; Copyright 2022, Costantino Pacilio.
 
     </p>
   </div>

@@ -1,6 +1,11 @@
 include README.rst
+
 include fishergw/taylorf2/README.rst
-include fishergw/detector/*psd.dat
+
+include fishergw/detector/*asd.txt
+include fihsergw/detector/unofficial_asd/*.txt
 include fishergw/detector/README.rst
-include fishergw/cosmology/README.rst
-include fishergw/cosmology/redshift_distance_table.dat
+
+include fishergw/ringdown/qnm_data/*.dat
+
+include examples/*
