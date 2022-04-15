@@ -8,6 +8,7 @@
 /scripts/**
 /fishergw/detector/S_h_scird*
 ringdown.py
+README_bckp.rst
 
 .readthedocs.yaml
 

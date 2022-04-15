@@ -2,7 +2,7 @@ About
 -----
 A Python package to compute Fisher matrices for gravitational wave models
 
-`Documentation <https://fishergw.readthedocs.io/en/latest/>`_ is still under construction, but you can look at the `examples <examples/>`_ folder, including an extensive `tutorial.ipynb <examples/tutorial.ipynb>`_ notebook tutorial.
+Documentation is still under construction, but you can look at the `examples <https://github.com/cpacilio/fishergw/tree/main/examples>`_ folder, including an extensive `tutorial.ipynb <https://github.com/cpacilio/fishergw/tree/main/examples/tutorial.ipynb>`_ notebook tutorial.
 
 Installation
 ------------
