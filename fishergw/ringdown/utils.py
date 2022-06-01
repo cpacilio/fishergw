@@ -174,9 +174,12 @@ def qnm_Kerr(mass,spin,mode,method='interp',interp_qnm={}):
             (2,2,1): np.array([1,0.388928,-3.119527,1.746957]),\
             (3,3,0): np.array([1,-2.130446,1.394144,-0.261229])}
         ##
-        ss = np.array([spin**i for i in range(4)])
-        omegaR = np.sum(BR[mode]*ss)/np.sum(CR[mode]*ss)
-        omegaI = np.sum(BI[mode]*ss)/np.sum(CI[mode]*ss)
+        b0,b1,b2,b3 = BR[mode]
+        c0,c1,c2,c3 = CR[mode]
+        omegaR = (b0+b1*spin+b2*spin**2+b3*spin**3)/(c0+c1*spin+c2*spin**2+c3*spin**3)
+        b0,b1,b2,b3 = BI[mode]
+        c0,c1,c2,c3 = CI[mode]
+        omegaI = (b0+b1*spin+b2*spin**2+b3*spin**3)/(c0+c1*spin+c2*spin**2+c3*spin**3)
         # f and tau
         f = omegaR/(2*np.pi)/mass/tsun
         tau = 1/omegaI*mass*tsun
@@ -188,8 +191,8 @@ def qnm_Kerr(mass,spin,mode,method='interp',interp_qnm={}):
         else:
             filename = dir_path+'/qnm_data/%s%s%s.dat'%(mode[0],mode[1],mode[2])
             x,y,z,_,_ = np.loadtxt(filename).T
-            omega_interp = interp1d(x,y)#,kind='cubic')
-            tau_interp_m1 = interp1d(x,-z)#,kind='cubic')
+            omega_interp = interp1d(x,y,kind='cubic')
+            tau_interp_m1 = interp1d(x,-z,kind='cubic')
             interp_qnm[mode] = (omega_interp,tau_interp_m1)
 
         omega = omega_interp(spin)/mass/tsun
@@ -198,7 +201,7 @@ def qnm_Kerr(mass,spin,mode,method='interp',interp_qnm={}):
     
     return f, tau
 
-def invert_qnm_from_f(f,mode,method='fit2'):
+def invert_qnm_from_f(f,mode,method='interp'):
     """
     Returns the masses (in units if solar masses) and dimensionless spins compatible with a given QNM frequency, assuming it is generated from the Kerr spectrum.
     
@@ -208,13 +211,13 @@ def invert_qnm_from_f(f,mode,method='fit2'):
     :param mode: the QNM numbers (l,m,n).
     :type mode: tuple
     """
-    #spins = np.linspace(-0.998,0.998,200)
-    spins = np.linspace(0,0.998,100)
-    qnms = np.array([qnm_Kerr(1,spin,mode,method)[0] for spin in spins])
+    spins = np.linspace(-0.998,0.998,200)
+    #spins = np.linspace(0,0.998,100)
+    qnms = qnm_Kerr(1,spins,mode,method)[0]
     masses = qnms/f
     return masses,spins
 
-def invert_qnm_from_tau(tau,mode,method='fit2'):
+def invert_qnm_from_tau(tau,mode,method='interp'):
     """
     Returns the masses (in units of solar masses) and spins compatible with a given QNM damping time, assuming it is generated from the Kerr spectrum.
     
@@ -224,14 +227,14 @@ def invert_qnm_from_tau(tau,mode,method='fit2'):
     :param mode: the QNM numbers (l,m,n).
     :type mode: tuple
     """
-    #spins = np.linspace(-0.998,0.998,200)
-    spins = np.linspace(0,0.998,100)
-    qnms = np.array([qnm_Kerr(1,spin,mode,method)[1] for spin in spins])
+    spins = np.linspace(-0.998,0.998,200)
+    #spins = np.linspace(0,0.998,100)
+    qnms = qnm_Kerr(1,spins,mode,method)[1]
     masses = tau/qnms
     return masses,spins
 
 
-def invert_qnm_from_ff(f1,f2,mode1,mode2,method='fit2',qnm_invert={}):
+def invert_qnm_from_ff(f1,f2,mode1,mode2,method='interp',qnm_invert={}):
     """
     Returns the mass (in units of solar masses) and the dimensionless spin corresponding to a pair of frequencies, assuming they are generated from the Kerr spectrum.
 
@@ -252,31 +255,23 @@ def invert_qnm_from_ff(f1,f2,mode1,mode2,method='fit2',qnm_invert={}):
     """
     if mode1 == mode2:
         raise ValueError('mode1 and mode2 cannot be the same')
-
-    def f_ratio(spins):
-        f1 = np.array([qnm_Kerr(1,spin,mode1,method)[0] for spin in spins])
-        f2 = np.array([qnm_Kerr(1,spin,mode2,method)[0] for spin in spins])
-        #f1 = qnm_Kerr(1,spin,mode1,method)[0]
-        #f2 = qnm_Kerr(1,spin,mode2,method)[0]
-        return f1/f2
     
     if (mode1,mode2) not in qnm_invert.keys():
-        #X = np.linspace(-0.998,0.998,200)
-        X = np.linspace(0.,0.998,100)
-        y = f_ratio(X)
-        qnm_invert[(mode1,mode2)] = interp1d(y,X)#,kind='cubic')
+        spins = np.linspace(0.,0.998,100)
+        y1 = qnm_Kerr(1,spins,mode1,method)[0]
+        y2 = qnm_Kerr(1,spins,mode2,method)[0]
+        y = y1/y2
+        qnm_invert[(mode1,mode2)] = interp1d(y,spins,kind='cubic')
   
     try:
-        #spin = bisect(lambda x: f_ratio(x)-f1/f2,0.,0.998)
         spin = qnm_invert[(mode1,mode2)](f1/f2)
-        spin = spin.item()
         mass = qnm_Kerr(1,spin,mode1,method)[0]/f1
     except:
         spin = 10
         mass = 0
     return mass, spin
 
-def invert_qnm_from_ftau(f1,tau2,mode1,mode2,method='fit2',qnm_invert={}):
+def invert_qnm_from_ftau(f1,tau2,mode1,mode2,method='interp',qnm_invert={}):
     """
     Returns the mass (in units of solar masses) and the dimensionless spin corresponding to a frequency and a damping time, assuming they are generated from the Kerr spectrum.
 
@@ -294,16 +289,12 @@ def invert_qnm_from_ftau(f1,tau2,mode1,mode2,method='fit2',qnm_invert={}):
 
     :param method: The method used to approximate the Kerr spectrum. See methods available in the \qnm_Kerr function.
     """
-    def ftau_product(spins):
-        f1 = np.array([qnm_Kerr(1,spin,mode1,method)[0] for spin in spins])
-        tau2 = np.array([qnm_Kerr(1,spin,mode2,method)[1] for spin in spins])
-        return f1*tau2
-
     if (mode1,mode2) not in qnm_invert.keys():
-        #X = np.linspace(-0.998,0.998,200)
-        X = np.linspace(0.,0.998,100)
-        y = ftau_product(X)
-        qnm_invert[(mode1,mode2)] = interp1d(y,X)#,kind='cubic')
+        spins = np.linspace(0.,0.998,100)
+        y1 = qnm_Kerr(1,spins,mode1,method)[0]
+        y2 = qnm_Kerr(1,spins,mode2,method)[1]
+        y = y1*y2
+        qnm_invert[(mode1,mode2)] = interp1d(y,spins,kind='cubic')
 
     try:
         spin = qnm_invert[(mode1,mode2)](f1*tau2)
@@ -313,7 +304,7 @@ def invert_qnm_from_ftau(f1,tau2,mode1,mode2,method='fit2',qnm_invert={}):
         mass = 0
     return mass, spin
 
-def invert_qnm_from_tautau(tau1,tau2,mode1,mode2,method='fit2',qnm_invert={}):
+def invert_qnm_from_tautau(tau1,tau2,mode1,mode2,method='interp',qnm_invert={}):
     """
     Returns the mass (in units of solar masses) and the dimensionless spin corresponding to a pair of damping times, assuming they are generated from the Kerr spectrum.
 
@@ -339,19 +330,14 @@ def invert_qnm_from_tautau(tau1,tau2,mode1,mode2,method='fit2',qnm_invert={}):
     if mode1 == mode2:
         raise ValueError('mode1 and mode2 cannot be the same')
 
-    def tautau_ratio(spins):
-        tau1 = np.array([qnm_Kerr(1,spin,mode1,method)[1] for spin in spins])
-        tau2 = np.array([qnm_Kerr(1,spin,mode2,method)[1] for spin in spins])
-        return tau1/tau2
-
     if (mode1,mode2) not in qnm_invert.keys():
-        #X = np.linspace(-0.998,0.998,200)
-        X = np.linspace(0.,0.998,100)
-        y = tautau_ratio(X)
-        qnm_invert[(mode1,mode2)] = interp1d(y,X)#,kind='cubic')
+        spins = np.linspace(0.,0.998,100)
+        y1 = qnm_Kerr(1,spins,mode1,method)[1]
+        y2 = qnm_Kerr(1,spins,mode2,method)[1]
+        y = y1/y2
+        qnm_invert[(mode1,mode2)] = interp1d(y,spins,kind='cubic')
 
     try:
-        #spin = bisect(lambda x: tautau_ratio(x)-tau1/tau2,0.,0.998)
         spin = qnm_invert[(mode1,mode2)](tau1/tau2)
         mass = tau1/qnm_Kerr(1,spin,mode1,method)[1]
     except:
@@ -533,3 +519,75 @@ def final_spin(mass1,mass2,spin1,spin2,beta=0.,gamma=0.,method=2):
 
     return a_fin
 
+
+class QNMInvert():
+
+    def __init__(self,mode1,mode2,spin_bounds=[0.,0.998],method='interp'):
+        self.mode1 = mode1
+        self.mode2 = mode2
+        self.method = method
+        self.spin_bounds = spin_bounds
+        self._interp_inverts_()
+
+    def __call__(self,x1,x2,key):
+        if key[:2] == 'ft':
+            X = x1*x2
+        else:
+            X = x1/x2
+        ## compute the subset of invertible samples
+        bounds = self.cache_invert[key+'_bounds']
+        idx_low = np.where(X>=bounds[0])[0]
+        idx_high = np.where(X<=bounds[1])[0]
+        idx = np.intersect1d(idx_low,idx_high)
+        X = X[idx]
+        Z = x1[idx]
+        ## invert samples
+        spins = self.cache_invert[key](X)
+        ## restrict to physical range of spin
+        sm, sp = self.spin_bounds
+        idx_low = np.where(spins>=sm)[0]
+        idx_high = np.where(spins<=sp)[0]
+        idx2 = np.intersect1d(idx_low,idx_high)
+        spins = spins[idx2]
+        Z = Z[idx2]
+        ## 
+        if key[:1] == 'f':
+            mode = self.__dict__['mode%s'%key[-2]]
+            masses = qnm_Kerr(1,spins,mode)[0]/Z
+        elif key[:1] == 't':
+            mode = self.__dict__['mode%s'%key[-2]]
+            masses = Z/qnm_Kerr(1,spins,mode)[1]
+        return np.vstack((masses,spins)), idx, idx2
+
+    def _interp_inverts_(self):
+        sm, sp = self.spin_bounds
+        spins = np.linspace(sm,sp,1000)
+        f1, t1 = qnm_Kerr(1,spins,self.mode1,method=self.method)
+        f2, t2 = qnm_Kerr(1,spins,self.mode2,method=self.method)
+        self.cache_invert = {}
+        ##
+        ff = f1/f2
+        self.cache_invert['ff_12'] = interp1d(ff,spins,kind='cubic')
+        self.cache_invert['ff_12_bounds'] = [ff.min(),ff.max()]
+        ##
+        ft_11 = f1*t1
+        self.cache_invert['ft_11'] = interp1d(ft_11,spins,kind='cubic')
+        self.cache_invert['ft_11_bounds'] = [ft_11.min(),ft_11.max()]
+        ##
+        ft_12 = f1*t2
+        self.cache_invert['ft_12']= interp1d(ft_12,spins,kind='cubic')
+        self.cache_invert['ft_12_bounds'] = [ft_12.min(),ft_12.max()]
+        ##
+        ft_21 = f2*t1
+        self.cache_invert['ft_21'] = interp1d(ft_21,spins,kind='cubic')
+        self.cache_invert['ft_21_bounds'] = [ft_21.min(),ft_21.max()]
+        ##
+        ft_22 = f2*t2
+        self.cache_invert['ft_22'] = interp1d(f2*t2,spins,kind='cubic')
+        self.cache_invert['ft_22_bounds'] = [ft_22.min(),ft_22.max()]
+        ##
+        tt = t1/t2
+        self.cache_invert['tt_12'] = interp1d(t1/t2,spins,kind='cubic')
+        self.cache_invert['tt_12_bounds'] = [tt.min(),tt.max()]
+        ##
+        return None

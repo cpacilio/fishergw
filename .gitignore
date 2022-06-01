@@ -3,12 +3,14 @@
 /fishergw/taylorf2/waveform_*.py
 /fishergw/ringdown/waveform_*.py
 /fishergw/ringdown/modified_gr.py
+/fishergw/utils.py
 /output/**
 /notebooks/**
 /scripts/**
 /fishergw/detector/S_h_scird*
 ringdown.py
 README_bckp.rst
+
 
 .readthedocs.yaml
 

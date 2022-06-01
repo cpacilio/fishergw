@@ -40,7 +40,7 @@ References:
 
     _detectors_ = {'aligo':('aligo_asd.txt',1/np.sqrt(5)),\
                  'ce':('ce_asd.txt',1/np.sqrt(5)),\
-                 'etd':('etd_asd.txt',1/np.sqrt(3/10)),\
+                 'etd':('etd_asd.txt',np.sqrt(3/10)),\
                  'lisa':('lisa_asd.txt',1.)}
     
     def __init__(self,signal,integration_method=simps,\

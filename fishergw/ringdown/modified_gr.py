@@ -2,13 +2,19 @@
 
 import numpy as np
 from ..constants import speed_of_light, solar_mass, G, Mpc
+from .utils import qnm_Kerr
 
 cc = speed_of_light
 msun = solar_mass
 ## solar mass in secs
 tsun = msun*G/cc**3 ## secs
 
-
+def qnm_delta_f220(mass,spin,alpha,mode,method='interp'):
+    f, tau = qnm_Kerr(mass,spin,mode,method=method)
+    if mode == (2,2,0):
+        f *= (1+alpha)
+    return f, tau
+    
 def qnm_KerrNewman(mass,spin,charge,mode,method='fit2'):
     """
     Returns the frequency and the damping time of a Kerr-Newman black hole
@@ -143,12 +149,31 @@ def qnm_KerrNewman(mass,spin,charge,mode,method='fit2'):
                 [1.394144,-5.533669,6.393699,-2.254239],\
                 [-0.261229,1.517744,-1.810579,0.608393]])}
         ##
-        qq = np.array([charge**i for i in range(4)])
-        ss = np.array([spin**i for i in range(4)])
-        #omegaR = np.sum(np.dot(ss,np.dot(BR[mode],qq)))/np.sum(np.dot(ss,np.dot(CR[mode],qq)))
-        #omegaI = np.sum(np.dot(ss,np.dot(BI[mode],qq)))/np.sum(np.dot(ss,np.dot(CI[mode],qq)))
-        omegaR = np.sum(ss*np.dot(BR[mode],qq))/np.sum(ss*np.dot(CR[mode],qq))
-        omegaI = np.sum(ss*np.dot(BI[mode],qq))/np.sum(ss*np.dot(CI[mode],qq))
+        b0, b1, b2, b3 = BR[mode]
+        c0, c1, c2, c3 = BR[mode]
+        ##
+        omegaR_numerator = 0
+        omegaR_denominator = 0
+        b,c = BR[mode], CR[mode]
+        for k in range(b.shape[0]):
+            for j in range(b.shape[1]):
+                omegaR_numerator += b[k,j]*(spin**k)*(charge**j)
+                omegaR_denominator += c[k,j]*(spin**k)*(charge**j)
+        omegaR = omegaR_numerator/omegaR_denominator
+
+        omegaI_numerator = 0
+        omegaI_denominator = 0
+        b,c = BI[mode], CI[mode]
+        for k in range(b.shape[0]):
+            for j in range(b.shape[1]):
+                omegaI_numerator += b[k,j]*(spin**k)*(charge**j)
+                omegaI_denominator += c[k,j]*(spin**k)*(charge**j)
+        omegaI = omegaI_numerator/omegaI_denominator
+
+        #qq = np.array([charge**i for i in range(4)])
+        #ss = np.array([spin**i for i in range(4)])
+        #omegaR = np.sum(ss*np.dot(BR[mode],qq))/np.sum(ss*np.dot(CR[mode],qq))
+        #omegaI = np.sum(ss*np.dot(BI[mode],qq))/np.sum(ss*np.dot(CI[mode],qq))
         # f and tau
         f = omegaR/(2*np.pi)/mass/tsun
         tau = 1/omegaI*mass*tsun
